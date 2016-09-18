@@ -20,6 +20,7 @@ public enum Response {
     BAD_SEQUENCE(503, "Bad sequence of commands"),
     ARGUMENT_NOT_IMPLEMENTED(504, "SmtpCommand parameter not implemented"),
     MUST_USE_TLS(530, "Must issue a STARTTLS command first"),
+    INVALID_CREDENTIALS(535, "Authentication credentials invalid"),
     MAILBOX_NOT_FOUND(550, "Requested action not taken: mailbox unavailable"),
     USER_NOT_LOCAL(551, "User not local; please try %s"),
     NO_STORAGE_LEFT(552, "Requested mail action aborted: exceeded storage allocation"),

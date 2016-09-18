@@ -39,6 +39,13 @@ public abstract class DBStorage<T extends Unquie> {
 
     ////>
 
+    public void removeFromCache(T object) {
+        if (object == null) return;
+        store.remove(object.getId());
+    }
+
+    ////>
+
     public abstract List<T> getAll();
 
     public abstract T get(int id);

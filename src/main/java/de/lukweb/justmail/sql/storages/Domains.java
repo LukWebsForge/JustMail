@@ -1,7 +1,10 @@
 package de.lukweb.justmail.sql.storages;
 
+import de.lukweb.justmail.JustMail;
+import de.lukweb.justmail.console.JustLogger;
 import de.lukweb.justmail.sql.DB;
 import de.lukweb.justmail.sql.DBStorage;
+import de.lukweb.justmail.sql.Storages;
 import de.lukweb.justmail.sql.objects.Domain;
 
 import java.sql.ResultSet;
@@ -25,6 +28,11 @@ public class Domains extends DBStorage<Domain> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        String host = JustMail.getInstance().getConfig().getHost();
+        if (get(host) == null) {
+            insert(new Domain(-1, host, true));
+            JustLogger.logger().info("Created a domin for the host domain.");
+        }
     }
 
     @Override
@@ -35,6 +43,16 @@ public class Domains extends DBStorage<Domain> {
     @Override
     public Domain get(int id) {
         return store.get(id);
+    }
+
+    public Domain get(String domainName) {
+        for (Domain domain : store.values()) if (domain.getDomain().equalsIgnoreCase(domainName)) return domain;
+        return null;
+    }
+
+    public boolean isAllowed(String domainStr) {
+        for (Domain domain : store.values()) if (domain.getDomain().equalsIgnoreCase(domainStr)) return true;
+        return false;
     }
 
     @Override
@@ -52,6 +70,12 @@ public class Domains extends DBStorage<Domain> {
     @Override
     public void delete(Domain object) {
         if (object.getId() == -1) return;
+
+        Users users = Storages.get(Users.class);
+        users.getAll().stream()
+                .filter(user -> user.getDomain().equals(object))
+                .forEach(users::removeFromCache);
+
         store.remove(object.getId());
         DB.getSql().queryUpdate("DELETE FROM domains WHERE id = ?", object.getId());
     }

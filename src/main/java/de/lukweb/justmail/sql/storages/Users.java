@@ -23,7 +23,7 @@ public class Users extends DBStorage<User> {
             Domains domains = Storages.get(Domains.class);
             while (rs.next()) store.put(rs.getInt("id"), new User(rs.getInt("id"), rs.getString("username"),
                     domains.get(rs.getInt("domain")), rs.getString("fullEmail"), rs.getString("password"),
-                    rs.getInt("created")));
+                    rs.getBytes("base64up"), rs.getInt("created")));
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -39,19 +39,26 @@ public class Users extends DBStorage<User> {
         return store.get(id);
     }
 
+    public User getByBase64(String base64up) {
+        for (User user : store.values()) if (user.getBase64UsernamePassword().trim().equals(base64up)) return user;
+        return null;
+    }
+
     @Override
     protected int insert(User object) {
         ResultSet rs = DB.getSql().queryUpdateWithKeys("INSERT INTO users (username, domain, fullEmail, password, " +
-                        "created) VALUES (?, ?, ?, ?, ?)", object.getUsername(), object.getDomain().getId(),
-                object.getFullEmail(), object.getHashedPassword(), object.getCreated());
+                        "base64up, created) VALUES (?, ?, ?, ?, ?)", object.getUsername(), object.getDomain().getId(),
+                object.getFullEmail(), object.getHashedPassword(), object.getEncryptedBase64UP(),
+                object.getCreated());
         return getFirstKey(rs);
     }
 
     @Override
     protected void update(User object) {
-        DB.getSql().queryUpdate("UPDATE users username = ?, domain = ?, fullEmail = ?, password = ? WHERE id = ?",
+        DB.getSql().queryUpdate("UPDATE users username = ?, domain = ?, fullEmail = ?, password = ?, base64up = ? " +
+                        "WHERE id = ?",
                 object.getUsername(), object.getDomain().getId(), object.getFullEmail(), object.getHashedPassword(),
-                object.getId());
+                object.getEncryptedBase64UP(), object.getId());
     }
 
     @Override

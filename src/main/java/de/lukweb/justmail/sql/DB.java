@@ -22,7 +22,7 @@ public class DB {
                 " `date` INTEGER, " + //
                 " `content` BLOB " +
                 ")");
-        sql.queryUpdate("CREATE TABLE `domains` ( " +
+        sql.queryUpdate("CREATE TABLE IF NOT EXISTS `domains` ( " +
                 " `id` INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 " `domain` TEXT, " +
                 " `enabled` INTEGER DEFAULT 1 " +
@@ -33,6 +33,7 @@ public class DB {
                 " `domain` INTEGER, " + // Reference to id @ domains
                 " `fullEmail` INTEGER, " +
                 " `password` TEXT, " +
+                " `base64up` BLOB, " +
                 " `created` INTEGER " +
                 ")");
     }

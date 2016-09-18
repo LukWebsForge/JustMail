@@ -3,7 +3,8 @@ package de.lukweb.justmail.smtp.command;
 import de.lukweb.justmail.smtp.Response;
 import de.lukweb.justmail.smtp.SmtpSession;
 import de.lukweb.justmail.smtp.command.objects.SmtpCommand;
-import de.lukweb.justmail.sql.objects.Domain;
+import de.lukweb.justmail.sql.Storages;
+import de.lukweb.justmail.sql.storages.Domains;
 import de.lukweb.justmail.utils.EmailAdress;
 
 public class RcptC extends SmtpCommand {
@@ -29,7 +30,8 @@ public class RcptC extends SmtpCommand {
         String to = toSplit[1];
         EmailAdress toEmail = new EmailAdress(to);
         EmailAdress from = session.getFrom();
-        if (from != null && !Domain.isAllowed(toEmail.getDomain()) && !Domain.isAllowed(from.getDomain())) {
+        Domains domains = Storages.get(Domains.class);
+        if (from != null && !domains.isAllowed(toEmail.getDomain()) && !domains.isAllowed(from.getDomain())) {
             session.send(Response.BAD_SEQUENCE.create());
             return;
         }

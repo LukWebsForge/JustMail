@@ -13,9 +13,9 @@ public class ConsoleCMDThread implements Runnable {
 
     @Override
     public void run() {
+        BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
+        String line;
         while (true) {
-            BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
-            String line;
             try {
                 line = bufferRead.readLine();
             } catch (IOException e) {
