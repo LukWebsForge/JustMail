@@ -20,27 +20,29 @@ public class AuthC extends SmtpCommand {
             session.send(Response.BAD_SEQUENCE.customMessage("You're already logged in!"));
             return;
         }
-        if (arguments.length == 0) {
-            session.send(Response.ARGUMENT_ERROR.create());
+        if (arguments.length == 1 && arguments[0].equalsIgnoreCase("PLAIN")) {
+            session.send(Response.CONTINE_AUTH.create());
+            session.setCallback(cache -> {
+                if (cache.equals("=")) return true;
+                authenticateUser(session, cache);
+                return true;
+            });
+        } else if (arguments.length == 2 && arguments[0].equalsIgnoreCase("PLAIN")) {
+            authenticateUser(session, arguments[1]);
             return;
-        } else if (arguments.length == 1) {
-            if (!arguments[0].equalsIgnoreCase("PLAIN")) {
-                session.send(Response.ARGUMENT_ERROR.create());
-                return;
-            }
-            // todo plain save stuff
-        } else if (arguments.length == 2) {
-            if (!arguments[0].equalsIgnoreCase("PLAIN")) {
-                session.send(Response.ARGUMENT_ERROR.create());
-                return;
-            }
-            User user = Storages.get(Users.class).getByBase64(arguments[1]);
-            if (user == null) {
-                session.send(Response.INVALID_CREDENTIALS.create());
-                return;
-            }
-            session.setUser(user);
         }
+
+        session.send(Response.ARGUMENT_ERROR.create());
+    }
+
+    private void authenticateUser(SmtpSession session, String plain) {
+        User user = Storages.get(Users.class).getByBase64(plain);
+        if (user == null) {
+            session.send(Response.INVALID_CREDENTIALS.create());
+            return;
+        }
+        session.setUser(user);
+        session.send(Response.AUTH_SUCCESSFUL.create());
     }
 
 }

@@ -2,11 +2,10 @@ package de.lukweb.justmail.socket;
 
 import de.lukweb.justmail.JustMail;
 import de.lukweb.justmail.console.JustLogger;
-import de.lukweb.justmail.smtp.SmtpCommands;
 import de.lukweb.justmail.smtp.Response;
+import de.lukweb.justmail.smtp.SmtpCommands;
 import de.lukweb.justmail.smtp.SmtpSession;
 
-import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -37,8 +36,6 @@ public class MailSocketHandler implements Runnable {
             out.flush();
 
             boolean telnetCommand = false;
-            byte[] buffer = new byte[1024 * 64];
-            ByteArrayOutputStream arrayOut = new ByteArrayOutputStream();
 
             while (true) {
                 int read = in.read();
@@ -56,22 +53,9 @@ public class MailSocketHandler implements Runnable {
                 }
                 cache += (char) read;
                 if (!(cache.endsWith("\n\r") || cache.endsWith("\n"))) continue;
-                if (session.isReadingData()) {
-                    if (cache.trim().startsWith(".")) {
-                        session.setReadData(false);
-                        cache = "";
-                        if (arrayOut.size() > JustMail.getInstance().getConfig().getMaxMailSize()) {
-                            session.send(Response.NO_STORAGE_LEFT.create());
-                        } else {
-                            session.setData(arrayOut.toByteArray());
-                            session.save();
-                            session.send(Response.ACTION_OKAY.create());
-                        }
-                        session.resetMailData();
-                        continue;
-                    }
-                    if (arrayOut.size() > JustMail.getInstance().getConfig().getMaxMailSize()) continue;
-                    arrayOut.write(buffer, 0, read);
+                if (session.getCallback() != null) {
+                    boolean breakCB = session.getCallback().callback(cache);
+                    if (breakCB) session.setCallback(null);
                     cache = "";
                     continue;
                 }

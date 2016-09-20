@@ -61,7 +61,8 @@ public class User implements Unquie {
      */
     public void setPassword(String password) {
         this.password = CryptoUtils.generateSHA512Password(password);
-        this.base64UsernamePassword = Base64.getEncoder().encodeToString((fullEmail + fullEmail + password).getBytes());
+        this.base64UsernamePassword = Base64.getEncoder().encodeToString(("\0" + fullEmail + "\0" + password)
+                .getBytes());
     }
 
     public int getCreated() {

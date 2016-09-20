@@ -2,6 +2,7 @@ package de.lukweb.justmail.smtp;
 
 import de.lukweb.justmail.JustMail;
 import de.lukweb.justmail.console.JustLogger;
+import de.lukweb.justmail.smtp.command.interfaces.SmtpInCallback;
 import de.lukweb.justmail.sql.objects.User;
 import de.lukweb.justmail.utils.CryptoUtils;
 import de.lukweb.justmail.utils.EmailAdress;
@@ -28,6 +29,8 @@ public class SmtpSession {
     private byte[] data;
 
     private User user;
+
+    private SmtpInCallback callback;
 
     public SmtpSession(Socket socket, DataInputStream in, DataOutputStream out) {
         this.socket = socket;
@@ -151,5 +154,13 @@ public class SmtpSession {
         if (data == null) return;
         JustLogger.logger().info("Recvied message from " + from + domain + " to " + to + ". " +
                 "Data:\n " + new String(data));
+    }
+
+    public SmtpInCallback getCallback() {
+        return callback;
+    }
+
+    public void setCallback(SmtpInCallback callback) {
+        this.callback = callback;
     }
 }
