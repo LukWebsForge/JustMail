@@ -47,7 +47,8 @@ public class Users extends DBStorage<User> {
     @Override
     protected int insert(User object) {
         ResultSet rs = DB.getSql().queryUpdateWithKeys("INSERT INTO users (username, domain, fullEmail, password, " +
-                        "base64up, created) VALUES (?, ?, ?, ?, ?)", object.getUsername(), object.getDomain().getId(),
+                        "base64up, created) VALUES (?, ?, ?, ?, ?, ?)", object.getUsername(), object.getDomain()
+                        .getId(),
                 object.getFullEmail(), object.getHashedPassword(), object.getEncryptedBase64UP(),
                 object.getCreated());
         return getFirstKey(rs);

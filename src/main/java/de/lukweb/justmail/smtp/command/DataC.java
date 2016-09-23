@@ -34,6 +34,7 @@ public class DataC extends SmtpCommand {
                     session.send(Response.ACTION_OKAY.create());
                 }
                 session.resetMailData();
+                session.send(Response.ACTION_OKAY.create());
                 return true;
             }
             if (arrayOut.size() > JustMail.getInstance().getConfig().getMaxMailSize()) return false;

@@ -35,7 +35,7 @@ public class SmtpCommands {
     }
 
     public static void handleCommand(String commandStr, SmtpSession session) {
-        String[] commandSplit = commandStr.split(" ");
+        String[] commandSplit = commandStr.replaceAll("\\n", "").replaceAll("\\r", "").split(" ");
         String commandName = commandSplit[0].trim();
 
         SmtpCommand command = getCommand(commandName);

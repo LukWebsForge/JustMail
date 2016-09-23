@@ -20,18 +20,19 @@ public class AuthC extends SmtpCommand {
             session.send(Response.BAD_SEQUENCE.customMessage("You're already logged in!"));
             return;
         }
-        if (arguments.length == 1 && arguments[0].equalsIgnoreCase("PLAIN")) {
-            session.send(Response.CONTINE_AUTH.create());
-            session.setCallback(cache -> {
-                if (cache.equals("=")) return true;
-                authenticateUser(session, cache);
-                return true;
-            });
-        } else if (arguments.length == 2 && arguments[0].equalsIgnoreCase("PLAIN")) {
-            authenticateUser(session, arguments[1]);
+        if (arguments.length >= 1 && arguments[0].equalsIgnoreCase("PLAIN")) {
+            if (arguments.length == 1) {
+                session.send(Response.CONTINE_AUTH.create());
+                session.setCallback(cache -> {
+                    if (cache.equals("=")) return true;
+                    authenticateUser(session, cache);
+                    return true;
+                });
+            } else {
+                authenticateUser(session, arguments[1]);
+            }
             return;
         }
-
         session.send(Response.ARGUMENT_ERROR.create());
     }
 

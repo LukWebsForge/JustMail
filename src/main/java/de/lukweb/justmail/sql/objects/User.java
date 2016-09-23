@@ -1,9 +1,9 @@
 package de.lukweb.justmail.sql.objects;
 
-import de.lukweb.justmail.JustMail;
 import de.lukweb.justmail.sql.interfaces.Unquie;
 import de.lukweb.justmail.utils.CryptoUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 public class User implements Unquie {
@@ -31,8 +31,7 @@ public class User implements Unquie {
         this.domain = domain;
         this.fullEmail = fullEmail;
         this.password = password;
-        this.base64UsernamePassword = CryptoUtils.decryptAES(base64UsernamePassword, JustMail.getInstance()
-                .getConfig().getSalt().getBytes());
+        this.base64UsernamePassword = CryptoUtils.decryptAES(base64UsernamePassword);
         this.created = created;
     }
 
@@ -62,7 +61,7 @@ public class User implements Unquie {
     public void setPassword(String password) {
         this.password = CryptoUtils.generateSHA512Password(password);
         this.base64UsernamePassword = Base64.getEncoder().encodeToString(("\0" + fullEmail + "\0" + password)
-                .getBytes());
+                .getBytes(StandardCharsets.UTF_8));
     }
 
     public int getCreated() {
@@ -78,6 +77,6 @@ public class User implements Unquie {
     }
 
     public byte[] getEncryptedBase64UP() {
-        return CryptoUtils.encryptAES(base64UsernamePassword, JustMail.getInstance().getConfig().getSalt().getBytes());
+        return CryptoUtils.encryptAES(base64UsernamePassword);
     }
 }

@@ -41,6 +41,7 @@ public class MailC extends SmtpCommand {
             return;
         }
         session.setFrom(fromEmail);
+        if (session.getTo() != null) session.setTo(null);
         session.send(Response.ACTION_OKAY.create());
     }
 

@@ -5,6 +5,8 @@ import de.lukweb.justmail.console.ConsoleCMDThread;
 import de.lukweb.justmail.console.JustLogger;
 import de.lukweb.justmail.crypto.KeyManager;
 import de.lukweb.justmail.socket.MailSocketServer;
+import de.lukweb.justmail.sql.Storages;
+import de.lukweb.justmail.sql.storages.Domains;
 
 import java.io.File;
 
@@ -21,12 +23,20 @@ public class JustMail {
     }
 
     private void start() {
+        System.out.println("Starting JustMail...");
+
         config = new Config(new File("config.ini"));
         if (!config.isValid()) return;
+
         key = new KeyManager(new File(config.getKeystore()), config.getKeyPassword());
         if (!key.isLoaded()) return;
+
         new Thread(() -> smtpServer = new MailSocketServer(config.getSmtpPort())).start();
+
         new Thread(new ConsoleCMDThread()).start();
+
+        Storages.get(Domains.class);
+
         JustLogger.logger().info("Started the JustMail server successfully!");
     }
 
