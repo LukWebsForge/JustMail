@@ -44,6 +44,11 @@ public class Users extends DBStorage<User> {
         return null;
     }
 
+    public User getByMail(String mail) {
+        for (User user : store.values()) if (user.getFullEmail().equalsIgnoreCase(mail.trim())) return user;
+        return null;
+    }
+
     @Override
     protected int insert(User object) {
         ResultSet rs = DB.getSql().queryUpdateWithKeys("INSERT INTO users (username, domain, fullEmail, password, " +

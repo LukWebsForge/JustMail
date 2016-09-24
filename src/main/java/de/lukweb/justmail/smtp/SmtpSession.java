@@ -2,10 +2,10 @@ package de.lukweb.justmail.smtp;
 
 import de.lukweb.justmail.JustMail;
 import de.lukweb.justmail.console.JustLogger;
-import de.lukweb.justmail.smtp.command.interfaces.SmtpInCallback;
 import de.lukweb.justmail.sql.objects.User;
 import de.lukweb.justmail.utils.CryptoUtils;
 import de.lukweb.justmail.utils.EmailAdress;
+import de.lukweb.justmail.utils.interfaces.CatchStreamCallback;
 
 import javax.net.ssl.SSLSocket;
 import java.io.DataInputStream;
@@ -30,7 +30,7 @@ public class SmtpSession {
 
     private User user;
 
-    private SmtpInCallback callback;
+    private CatchStreamCallback callback;
 
     public SmtpSession(Socket socket, DataInputStream in, DataOutputStream out) {
         this.socket = socket;
@@ -156,11 +156,11 @@ public class SmtpSession {
                 "Data:\n " + new String(data));
     }
 
-    public SmtpInCallback getCallback() {
+    public CatchStreamCallback getCallback() {
         return callback;
     }
 
-    public void setCallback(SmtpInCallback callback) {
+    public void setCallback(CatchStreamCallback callback) {
         this.callback = callback;
     }
 }

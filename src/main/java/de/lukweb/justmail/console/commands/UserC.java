@@ -1,5 +1,6 @@
 package de.lukweb.justmail.console.commands;
 
+import de.lukweb.justmail.console.ConsoleCMDThread;
 import de.lukweb.justmail.console.JustLogger;
 import de.lukweb.justmail.console.commands.objects.ConsoleCommand;
 import de.lukweb.justmail.sql.Storages;
@@ -7,6 +8,9 @@ import de.lukweb.justmail.sql.objects.Domain;
 import de.lukweb.justmail.sql.objects.User;
 import de.lukweb.justmail.sql.storages.Domains;
 import de.lukweb.justmail.sql.storages.Users;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class UserC implements ConsoleCommand {
 
@@ -51,7 +55,12 @@ public class UserC implements ConsoleCommand {
                 break;
             }
             case "list": {
-
+                String list = "\n <<< Users >>> \n";
+                SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
+                for (User user : users.getAll())
+                    list += "User: " + user.getFullEmail() + "; ID: " + user.getId() + "; Created: " +
+                            sdf.format(new Date(user.getCreated())) + "\n";
+                JustLogger.logger().info(list);
                 break;
             }
             case "status": {
@@ -59,11 +68,39 @@ public class UserC implements ConsoleCommand {
                 break;
             }
             case "changepw": {
-
+                if (args.length < 3) {
+                    sendTooLessArguments();
+                    break;
+                }
+                User user = users.getByMail(args[1]);
+                if (user == null) {
+                    JustLogger.logger().warning("Cannot find user with e-mail-adress \"" + args[1] + "\"");
+                    break;
+                }
+                user.setPassword(args[2]);
+                JustLogger.logger().info("The password for the user " + user.getFullEmail() + " was changed " +
+                        "successfully!");
                 break;
             }
             case "remove": {
-
+                if (args.length < 2) {
+                    sendTooLessArguments();
+                    break;
+                }
+                User user = users.getByMail(args[1]);
+                if (user == null) {
+                    JustLogger.logger().warning("Cannot find user with e-mail-adress \"" + args[1] + "\"");
+                    break;
+                }
+                String email = user.getFullEmail();
+                System.out.println("Do you really want to remove the user \"" + email + "\"? (yes/no) -" + " ");
+                ConsoleCMDThread.getInstance().setCallback(answer -> {
+                    if (!(answer.equalsIgnoreCase("yes") || answer.equalsIgnoreCase("y") ||
+                            answer.equalsIgnoreCase("true"))) return true;
+                    users.delete(user);
+                    JustLogger.logger().info("The user " + email + " was deleted successfully!");
+                    return true;
+                });
                 break;
             }
         }

@@ -18,6 +18,10 @@ public class DataC extends SmtpCommand {
     public void execute(String[] arguments, SmtpSession session) {
         if (!session.checkForHello()) return;
         if (!session.checkForForceSSL()) return;
+        if (session.getTo() == null || session.getFrom() == null) {
+            session.send(Response.BAD_SEQUENCE.create());
+            return;
+        }
         session.send(Response.START_DATA.create());
         session.setReadData(true);
 

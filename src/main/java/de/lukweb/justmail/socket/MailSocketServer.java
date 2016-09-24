@@ -1,5 +1,7 @@
 package de.lukweb.justmail.socket;
 
+import de.lukweb.justmail.console.JustLogger;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.concurrent.ExecutorService;
@@ -22,7 +24,8 @@ public class MailSocketServer {
             server = new ServerSocket(port);
             while (!server.isClosed()) pool.execute(new MailSocketHandler(server.accept()));
         } catch (IOException e) {
-            e.printStackTrace();
+            JustLogger.logger().severe("An error occurred while binding port " + port + ": " + e.getLocalizedMessage());
+            // e.printStackTrace();
         }
     }
 

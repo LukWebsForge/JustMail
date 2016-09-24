@@ -21,6 +21,7 @@ public class User implements Unquie {
         this.username = username;
         this.domain = domain;
         this.fullEmail = username + "@" + domain.getDomain();
+        this.created = (int) (System.currentTimeMillis() / 1000);
         setPassword(password);
     }
 

@@ -2,6 +2,7 @@ package de.lukweb.justmail.console;
 
 import de.lukweb.justmail.console.commands.objects.ConsoleCommand;
 import de.lukweb.justmail.console.commands.objects.ConsoleCommands;
+import de.lukweb.justmail.utils.interfaces.CatchStreamCallback;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,20 +10,46 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.logging.Level;
 
-public class ConsoleCMDThread implements Runnable {
+public class ConsoleCMDThread {
 
-    @Override
-    public void run() {
-        BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
+    private static ConsoleCMDThread instance;
+
+    public static ConsoleCMDThread getInstance() {
+        return instance;
+    }
+
+    private boolean stop = false;
+    private CatchStreamCallback callback;
+    private BufferedReader bufferReader;
+
+    public ConsoleCMDThread() {
+        run();
+        instance = this;
+    }
+
+    public void stop() {
+        stop = true;
+        try {
+            if (bufferReader != null) bufferReader.close();
+        } catch (IOException e) {
+        }
+    }
+
+    private void run() {
+        bufferReader = new BufferedReader(new InputStreamReader(System.in));
         String line;
-        while (true) {
+        while (!stop) {
             try {
-                line = bufferRead.readLine();
+                line = bufferReader.readLine();
             } catch (IOException e) {
                 return;
             }
             if (line == null) {
                 return;
+            }
+            if (callback != null) {
+                callback.callback(line);
+                continue;
             }
             if (line.trim().isEmpty()) continue;
             String[] args = line.split(" ");
@@ -47,4 +74,11 @@ public class ConsoleCMDThread implements Runnable {
         JustLogger.logger().log(level, string);
     }
 
+    public CatchStreamCallback getCallback() {
+        return callback;
+    }
+
+    public void setCallback(CatchStreamCallback callback) {
+        this.callback = callback;
+    }
 }

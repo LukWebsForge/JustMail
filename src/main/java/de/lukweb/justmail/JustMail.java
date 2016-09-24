@@ -7,15 +7,19 @@ import de.lukweb.justmail.crypto.KeyManager;
 import de.lukweb.justmail.socket.MailSocketServer;
 import de.lukweb.justmail.sql.Storages;
 import de.lukweb.justmail.sql.storages.Domains;
+import de.lukweb.justmail.utils.NetUtils;
 
 import java.io.File;
 
 public class JustMail {
 
     private static JustMail instance;
+
     private KeyManager key;
     private Config config;
+
     private MailSocketServer smtpServer;
+    private ConsoleCMDThread consoleThread;
 
     public JustMail() {
         instance = this;
@@ -31,9 +35,11 @@ public class JustMail {
         key = new KeyManager(new File(config.getKeystore()), config.getKeyPassword());
         if (!key.isLoaded()) return;
 
+        if (!NetUtils.isPortOpen(config.getSmtpPort())) return;
+
         new Thread(() -> smtpServer = new MailSocketServer(config.getSmtpPort())).start();
 
-        new Thread(new ConsoleCMDThread()).start();
+        new Thread(() -> consoleThread = new ConsoleCMDThread()).start();
 
         Storages.get(Domains.class);
 
@@ -42,8 +48,8 @@ public class JustMail {
 
     public void stop() {
         JustLogger.logger().info("Stopping the mail server...");
-        if (smtpServer == null) return;
-        smtpServer.stop();
+        if (smtpServer != null) smtpServer.stop();
+        if (consoleThread != null) consoleThread.stop();
     }
 
     public static JustMail getInstance() {
