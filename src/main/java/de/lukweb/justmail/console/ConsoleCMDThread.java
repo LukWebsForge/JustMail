@@ -37,7 +37,7 @@ public class ConsoleCMDThread implements Runnable {
                 return;
             }
             if (callback != null) {
-                callback.callback(line);
+                if (callback.callback(line)) setCallback(null);
                 continue;
             }
             if (line.trim().isEmpty()) continue;

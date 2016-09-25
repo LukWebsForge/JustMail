@@ -12,7 +12,7 @@ public class HelpC extends SmtpCommand {
 
     @Override
     public void execute(String[] arguments, SmtpSession session) {
-        Response.HELP_MESSAGE.create("Huston we have a problem!");
+        session.send(Response.HELP_MESSAGE.create("Huston we have a problem!"));
     }
 
 

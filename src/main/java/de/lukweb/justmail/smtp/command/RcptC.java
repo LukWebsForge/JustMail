@@ -35,6 +35,7 @@ public class RcptC extends SmtpCommand {
             session.send(Response.BAD_SEQUENCE.create());
             return;
         }
+        // Todo check for user
         session.setTo(toEmail);
         session.send(Response.ACTION_OKAY.create());
     }

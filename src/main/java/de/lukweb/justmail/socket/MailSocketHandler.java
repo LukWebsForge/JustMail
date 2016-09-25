@@ -41,7 +41,7 @@ public class MailSocketHandler implements Runnable {
             String ownDomain = JustMail.getInstance().getConfig().getHost();
 
             // First we send greetings
-            out.writeUTF(Response.SERVICE_READY.create(ownDomain));
+            out.write(Response.SERVICE_READY.create(ownDomain).getBytes());
             out.flush();
 
             boolean telnetCommand = false;

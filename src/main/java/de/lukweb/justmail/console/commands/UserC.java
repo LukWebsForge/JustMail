@@ -64,7 +64,21 @@ public class UserC implements ConsoleCommand {
                 break;
             }
             case "status": {
-
+                if (args.length < 2) {
+                    sendTooLessArguments();
+                    return;
+                }
+                User user = users.getByMail(args[1]);
+                if (user == null) {
+                    JustLogger.logger().warning("A user with the email \"" + args[0] + "\" can't be found!");
+                    return;
+                }
+                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm dd-MMM-yyyy");
+                String text = "\n <<< User Status >>> \n";
+                text += "EMail adress: " + user.getFullEmail() + "\n";
+                text += "ID: " + user.getId() + "\n";
+                text += "Created: " + sdf.format(new Date(user.getCreated())) + "\n";
+                JustLogger.logger().info(text);
                 break;
             }
             case "changepw": {
@@ -96,11 +110,18 @@ public class UserC implements ConsoleCommand {
                 System.out.println("Do you really want to remove the user \"" + email + "\"? (yes/no) -" + " ");
                 ConsoleCMDThread.getInstance().setCallback(answer -> {
                     if (!(answer.equalsIgnoreCase("yes") || answer.equalsIgnoreCase("y") ||
-                            answer.equalsIgnoreCase("true"))) return true;
+                            answer.equalsIgnoreCase("true"))) {
+                        JustLogger.logger().info("You cannled the deletion!");
+                        return true;
+                    }
                     users.delete(user);
                     JustLogger.logger().info("The user " + email + " was deleted successfully!");
                     return true;
                 });
+                break;
+            }
+            default: {
+                sendTooLessArguments();
                 break;
             }
         }

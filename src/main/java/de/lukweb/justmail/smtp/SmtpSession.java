@@ -152,7 +152,7 @@ public class SmtpSession {
 
     public void save() {
         if (data == null) return;
-        JustLogger.logger().info("Recvied message from " + from + domain + " to " + to + ". " +
+        JustLogger.logger().info("Recvied message from " + from.getAdress() + " to " + to.getAdress() + ". " +
                 "Data:\n " + new String(data));
     }
 

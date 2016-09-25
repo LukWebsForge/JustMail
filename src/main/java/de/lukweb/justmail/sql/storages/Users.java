@@ -71,5 +71,6 @@ public class Users extends DBStorage<User> {
     public void delete(User object) {
         if (object.getId() == -1) return;
         store.remove(object.getId());
+        DB.getSql().queryUpdate("DELETE FROM users WHERE id = ?", object.getId());
     }
 }
