@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.logging.Level;
 
-public class ConsoleCMDThread {
+public class ConsoleCMDThread implements Runnable {
 
     private static ConsoleCMDThread instance;
 
@@ -18,27 +18,16 @@ public class ConsoleCMDThread {
         return instance;
     }
 
-    private boolean stop = false;
     private CatchStreamCallback callback;
-    private BufferedReader bufferReader;
 
     public ConsoleCMDThread() {
-        run();
         instance = this;
     }
 
-    public void stop() {
-        stop = true;
-        try {
-            if (bufferReader != null) bufferReader.close();
-        } catch (IOException e) {
-        }
-    }
-
-    private void run() {
-        bufferReader = new BufferedReader(new InputStreamReader(System.in));
+    public void run() {
+        BufferedReader bufferReader = new BufferedReader(new InputStreamReader(System.in));
         String line;
-        while (!stop) {
+        while (!Thread.currentThread().isInterrupted()) {
             try {
                 line = bufferReader.readLine();
             } catch (IOException e) {

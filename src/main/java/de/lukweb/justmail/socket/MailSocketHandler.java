@@ -10,16 +10,25 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class MailSocketHandler implements Runnable {
+
+    private static ArrayList<MailSocketHandler> instances = new ArrayList<>();
+
+    public static void stopAll() {
+        instances.forEach(MailSocketHandler::stop);
+    }
 
     private Socket socket;
 
     public MailSocketHandler(Socket socket) {
         this.socket = socket;
+        instances.add(this);
     }
 
     public void run() {
+        if (Thread.currentThread().isInterrupted()) return;
         try {
             JustLogger.logger().fine("New connection from " + socket.getInetAddress().getHostAddress());
 
@@ -37,7 +46,7 @@ public class MailSocketHandler implements Runnable {
 
             boolean telnetCommand = false;
 
-            while (true) {
+            while (!Thread.currentThread().isInterrupted()) {
                 int read = in.read();
                 if (read == -1) break;
                 if (read == 4) {
@@ -70,6 +79,20 @@ public class MailSocketHandler implements Runnable {
 
             JustLogger.logger().fine("Closed connection from " + socket.getInetAddress().getHostAddress());
         } catch (IOException ignored) {
+        }
+    }
+
+    private void stop() {
+        if (socket == null || socket.isClosed()) return;
+        try {
+            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+            out.writeUTF(Response.SERVICE_CLOSING.create());
+        } catch (IOException e) {
+        } finally {
+            try {
+                socket.close();
+            } catch (IOException e) {
+            }
         }
     }
 

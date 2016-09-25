@@ -13,34 +13,45 @@ public class MailSocketServer {
     private int port;
     private ServerSocket server;
     private ExecutorService pool = Executors.newCachedThreadPool();
+    private boolean stop;
 
     public MailSocketServer(int port) {
         this.port = port;
-        start();
     }
 
-    private void start() {
+    public void start() {
+        stop = false;
         try {
             server = new ServerSocket(port);
-            while (!server.isClosed()) pool.execute(new MailSocketHandler(server.accept()));
+            while (!server.isClosed()) {
+                if (Thread.currentThread().isInterrupted()) {
+                    stop();
+                    return;
+                }
+                pool.execute(new MailSocketHandler(server.accept()));
+            }
         } catch (IOException e) {
-            JustLogger.logger().severe("An error occurred while binding port " + port + ": " + e.getLocalizedMessage());
+            if (!stop)
+                JustLogger.logger().severe("An error occurred while binding port " + port + ": " + e.getLocalizedMessage());
             // e.printStackTrace();
         }
     }
 
     public void stop() {
+        stop = true;
         try {
             server.close();
         } catch (IOException e) {
-            e.printStackTrace();
         }
+
+        MailSocketHandler.stopAll();
+
+        pool.shutdown();
         try {
-            pool.awaitTermination(1, TimeUnit.SECONDS);
+            if (!pool.awaitTermination(1, TimeUnit.SECONDS)) pool.shutdownNow();
         } catch (InterruptedException e) {
             pool.shutdownNow();
         }
     }
-
 
 }

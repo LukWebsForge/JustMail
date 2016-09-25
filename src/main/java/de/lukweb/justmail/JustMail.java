@@ -19,7 +19,10 @@ public class JustMail {
     private Config config;
 
     private MailSocketServer smtpServer;
-    private ConsoleCMDThread consoleThread;
+    private Thread smtpThread;
+    private Thread consoleThread;
+
+    private boolean stopped;
 
     public JustMail() {
         instance = this;
@@ -37,9 +40,14 @@ public class JustMail {
 
         if (!NetUtils.isPortOpen(config.getSmtpPort())) return;
 
-        new Thread(() -> smtpServer = new MailSocketServer(config.getSmtpPort())).start();
+        smtpServer = new MailSocketServer(config.getSmtpPort());
+        smtpThread = new Thread(() -> smtpServer.start());
+        smtpThread.setName("SMTP Server");
+        smtpThread.start();
 
-        new Thread(() -> consoleThread = new ConsoleCMDThread()).start();
+        consoleThread = new Thread(new ConsoleCMDThread());
+        consoleThread.setName("Console Thread");
+        consoleThread.start();
 
         Storages.get(Domains.class);
 
@@ -47,9 +55,13 @@ public class JustMail {
     }
 
     public void stop() {
+        if (stopped) return;
+        stopped = true;
         JustLogger.logger().info("Stopping the mail server...");
-        if (smtpServer != null) smtpServer.stop();
-        if (consoleThread != null) consoleThread.stop();
+        Storages.shutdown();
+        if (smtpThread != null && smtpServer != null) smtpServer.stop();
+        if (consoleThread != null) consoleThread.interrupt();
+        JustLogger.logger().info("See you next time!");
     }
 
     public static JustMail getInstance() {
@@ -58,9 +70,5 @@ public class JustMail {
 
     public Config getConfig() {
         return config;
-    }
-
-    public MailSocketServer getSmtpServer() {
-        return smtpServer;
     }
 }
