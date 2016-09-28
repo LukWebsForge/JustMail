@@ -31,6 +31,7 @@ public class SmtpSession {
     private User user;
 
     private CatchStreamCallback callback;
+    private boolean upgradingToSSL;
 
     public SmtpSession(Socket socket, DataInputStream in, DataOutputStream out) {
         this.socket = socket;
@@ -39,6 +40,7 @@ public class SmtpSession {
     }
 
     public void send(String response) {
+        if (upgradingToSSL) return;
         try {
             out.write(response.getBytes());
             out.flush();
@@ -133,9 +135,22 @@ public class SmtpSession {
         this.domain = domain;
     }
 
-    public boolean upgradeToSSL() {
-        ssl = CryptoUtils.upgradeConnection(socket);
-        return isUsingSSL();
+    public void upgradeToSSL() {
+        upgradingToSSL = true;
+        ssl = CryptoUtils.upgradeConnection(socket, true, sslSocket -> {
+            this.ssl = sslSocket;
+            try {
+                this.in = new DataInputStream(sslSocket.getInputStream());
+                this.out = new DataOutputStream(sslSocket.getOutputStream());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            upgradingToSSL = false;
+        });
+    }
+
+    public boolean isUpgradingToSSL() {
+        return upgradingToSSL;
     }
 
     public boolean isUsingSSL() {

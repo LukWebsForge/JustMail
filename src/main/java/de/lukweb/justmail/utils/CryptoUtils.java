@@ -16,6 +16,7 @@ import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 public class CryptoUtils {
 
@@ -79,10 +80,13 @@ public class CryptoUtils {
         return null;
     }
 
-    public static SSLSocket upgradeConnection(Socket socket) {
+    public static SSLSocket upgradeConnection(Socket socket, boolean server, Consumer<SSLSocket> callback) {
         try {
-            SSLContext sc = SSLContext.getInstance("TLS");
-            sc.init(null, new TrustManager[]{
+            SSLContext sc = SSLContext.getInstance("TLSv1");
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            kmf.init(JustMail.getInstance().getKey().getStore(), JustMail.getInstance().getConfig().getKeyPassword()
+                    .toCharArray());
+            sc.init(kmf.getKeyManagers(), new TrustManager[]{
                     new X509TrustManager() {
                         @Override
                         public void checkClientTrusted(X509Certificate[] x509Certificates, String s)
@@ -106,11 +110,22 @@ public class CryptoUtils {
                     socket.getInetAddress().getHostAddress(),
                     socket.getPort(),
                     true);
+            sslSocket.setEnableSessionCreation(true);
+            sslSocket.setUseClientMode(!server);
+
+            sslSocket.setEnabledCipherSuites(sc.getServerSocketFactory().getSupportedCipherSuites());
+            sslSocket.setEnabledProtocols(new String[]{"TLSv1", "TLSv1.1", "TLSv1.2"});
+
+            sslSocket.addHandshakeCompletedListener(handshakeCompletedEvent ->
+                    callback.accept(handshakeCompletedEvent.getSocket()));
+
             sslSocket.startHandshake();
-            return sslSocket;
+
         } catch (NoSuchAlgorithmException | KeyManagementException | IOException e) {
             System.err.println("Cannot upgrade connection from " + socket.getInetAddress().getHostAddress() + " to " +
-                    " SSL: " + e.getMessage());
+                    "TLS: " + e.getMessage());
+        } catch (UnrecoverableKeyException | KeyStoreException e) {
+            System.err.println("Cannot load key: " + e.getLocalizedMessage());
         }
         return null;
     }

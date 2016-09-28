@@ -71,4 +71,8 @@ public class JustMail {
     public Config getConfig() {
         return config;
     }
+
+    public KeyManager getKey() {
+        return key;
+    }
 }

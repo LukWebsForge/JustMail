@@ -25,7 +25,7 @@ public class Config {
     private String keyPassword;
 
     private boolean forceSSL;
-    private int maxMailSize;
+    private long maxMailSize;
 
     private boolean debug;
 
@@ -81,7 +81,7 @@ public class Config {
 
             Section db = ini.get("database");
             salt = db.get("salt");
-            maxMailSize = Integer.parseInt(db.get("max_mail_size"));
+            maxMailSize = Long.parseLong(db.get("max_mail_size"));
 
             Section keys = ini.get("keys");
             keystore = keys.get("keystore");
@@ -129,7 +129,7 @@ public class Config {
         return keyPassword;
     }
 
-    public int getMaxMailSize() {
+    public long getMaxMailSize() {
         return maxMailSize;
     }
 

@@ -47,6 +47,13 @@ public class MailSocketHandler implements Runnable {
             boolean telnetCommand = false;
 
             while (!Thread.currentThread().isInterrupted()) {
+                if (session.isUpgradingToSSL()) try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    break;
+                }
+                in = session.getIn();
+                out = session.getOut();
                 int read = in.read();
                 if (read == -1) break;
                 if (read == 4) {
