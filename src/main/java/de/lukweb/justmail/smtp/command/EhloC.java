@@ -1,10 +1,13 @@
 package de.lukweb.justmail.smtp.command;
 
 import de.lukweb.justmail.JustMail;
+import de.lukweb.justmail.config.Config;
 import de.lukweb.justmail.smtp.Response;
 import de.lukweb.justmail.smtp.SmtpSession;
 import de.lukweb.justmail.smtp.command.objects.SmtpCommand;
 import de.lukweb.justmail.utils.StringUtils;
+
+import java.util.ArrayList;
 
 public class EhloC extends SmtpCommand {
 
@@ -20,18 +23,34 @@ public class EhloC extends SmtpCommand {
         }
         String domain = StringUtils.removeNewLine(arguments[0]);
         session.setDomain(domain);
-        String[] supportedExtensions = {
-                "250-8BITMIME",
-                "250-AUTH PLAIN",
-                "250-CHUNKING",
-                "250-DSN",
-                "250-SIZE",
-                "250-SMTPUTF8",
-                "250 STARTTLS"
-        };
-        String ehloMessage = "250-" + JustMail.getInstance().getConfig().getHost() + " Hello " + domain + "\r\n" +
-                String.join("\r\n", (CharSequence[]) supportedExtensions) + "\r\n";
-        session.send(ehloMessage);
+        Config config = JustMail.getInstance().getConfig();
+        /*
+        Extensions I want to implement
+
+        250-8BITMIME
+        250-CHUNKING
+        250-DSN
+        250-SMTPUTF8
+        */
+        ArrayList<String> supportedExtensions = new ArrayList<>();
+
+        supportedExtensions.add(config.getHost() + " Hello " + domain);
+        supportedExtensions.add("AUTH PLAIN");
+        supportedExtensions.add("SIZE " + config.getMaxMailSize());
+        if (!session.isUsingSSL()) supportedExtensions.add("STARTTLS");
+
+        String extensionsStr = "";
+
+        for (int i = 0; i < supportedExtensions.size(); i++) {
+            if (i + 1 >= supportedExtensions.size()) {
+                extensionsStr += "250 " + supportedExtensions.get(i);
+            } else {
+                extensionsStr += "250-" + supportedExtensions.get(i);
+            }
+            extensionsStr += "\r\n";
+        }
+
+        session.send(extensionsStr);
     }
 
 }

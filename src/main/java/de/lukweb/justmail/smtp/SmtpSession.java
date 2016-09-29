@@ -12,6 +12,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class SmtpSession {
 
@@ -45,6 +46,12 @@ public class SmtpSession {
             out.write(response.getBytes());
             out.flush();
         } catch (IOException e) {
+            if (e instanceof SocketException && e.getMessage().toLowerCase().contains("broken pipe")) {
+                JustLogger.logger().fine("Server from " + socket.getInetAddress().getHostAddress() + " closed " +
+                        "connection!");
+                close();
+                return;
+            }
             e.printStackTrace();
         }
     }
@@ -177,5 +184,18 @@ public class SmtpSession {
 
     public void setCallback(CatchStreamCallback callback) {
         this.callback = callback;
+    }
+
+    public void close() {
+        try {
+            in.close();
+            out.close();
+        } catch (IOException e) {
+        } finally {
+            try {
+                socket.close();
+            } catch (IOException e) {
+            }
+        }
     }
 }

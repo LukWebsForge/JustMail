@@ -49,6 +49,10 @@ public class Users extends DBStorage<User> {
         return null;
     }
 
+    public boolean exists(String mail) {
+        return getByMail(mail) != null;
+    }
+
     @Override
     protected int insert(User object) {
         ResultSet rs = DB.getSql().queryUpdateWithKeys("INSERT INTO users (username, domain, fullEmail, password, " +

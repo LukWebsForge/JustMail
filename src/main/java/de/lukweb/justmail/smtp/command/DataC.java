@@ -25,10 +25,7 @@ public class DataC extends SmtpCommand {
         session.send(Response.START_DATA.create());
         session.setReadData(true);
 
-        byte[] buffer = new byte[1024 * 64];
         ByteArrayOutputStream arrayOut = new ByteArrayOutputStream();
-
-        // todo bug
 
         session.setCallback(cache -> {
             if (cache.trim().equalsIgnoreCase(".")) {
@@ -43,10 +40,9 @@ public class DataC extends SmtpCommand {
                 session.send(Response.ACTION_OKAY.create());
                 return true;
             }
-            System.out.println(arrayOut.size());
             if (arrayOut.size() > JustMail.getInstance().getConfig().getMaxMailSize()) return false;
             try {
-                arrayOut.write(buffer);
+                arrayOut.write(cache.getBytes());
             } catch (IOException e) {
                 e.printStackTrace();
             }

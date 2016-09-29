@@ -4,7 +4,7 @@ import de.lukweb.justmail.smtp.Response;
 import de.lukweb.justmail.smtp.SmtpSession;
 import de.lukweb.justmail.smtp.command.objects.SmtpCommand;
 import de.lukweb.justmail.sql.Storages;
-import de.lukweb.justmail.sql.storages.Domains;
+import de.lukweb.justmail.sql.storages.Users;
 import de.lukweb.justmail.utils.EmailAdress;
 
 public class RcptC extends SmtpCommand {
@@ -30,12 +30,11 @@ public class RcptC extends SmtpCommand {
         String to = toSplit[1];
         EmailAdress toEmail = new EmailAdress(to);
         EmailAdress from = session.getFrom();
-        Domains domains = Storages.get(Domains.class);
-        if (from != null && !domains.isAllowed(toEmail.getDomain()) && !domains.isAllowed(from.getDomain())) {
-            session.send(Response.BAD_SEQUENCE.create());
+        Users users = Storages.get(Users.class);
+        if (from != null && !users.exists(toEmail.getAdress()) && !users.exists(from.getAdress())) {
+            session.send(Response.MAILBOX_NOT_FOUND.create());
             return;
         }
-        // Todo check for user
         session.setTo(toEmail);
         session.send(Response.ACTION_OKAY.create());
     }
