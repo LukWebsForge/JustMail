@@ -1,11 +1,11 @@
 package de.lukweb.justmail.smtp.command;
 
+import de.lukweb.justmail.mail.EmailAdress;
 import de.lukweb.justmail.smtp.Response;
 import de.lukweb.justmail.smtp.SmtpSession;
 import de.lukweb.justmail.smtp.command.objects.SmtpCommand;
 import de.lukweb.justmail.sql.Storages;
 import de.lukweb.justmail.sql.storages.Users;
-import de.lukweb.justmail.utils.EmailAdress;
 
 public class MailC extends SmtpCommand {
 
@@ -36,8 +36,13 @@ public class MailC extends SmtpCommand {
         }
         EmailAdress to = session.getTo();
         Users users = Storages.get(Users.class);
-        if (to != null && !users.exists(session.getFrom().getAdress()) && !users.exists(to.getAdress())) {
+        if (to != null && !users.exists(fromEmail.getAdress()) && !users.exists(to.getAdress())) {
             session.send(Response.MAILBOX_NOT_FOUND.create());
+            return;
+        }
+        if (users.exists(fromEmail.getAdress()) && (session.getUser() == null ||
+                !fromEmail.getAdress().equalsIgnoreCase(session.getUser().getFullEmail()))) {
+            session.send(Response.AUTH_REQUIRED.create());
             return;
         }
         session.setFrom(fromEmail);

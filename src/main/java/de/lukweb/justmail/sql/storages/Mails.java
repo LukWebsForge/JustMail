@@ -48,10 +48,10 @@ public class Mails extends DBStorage<Mail> {
 
     @Override
     protected int insert(Mail object) {
-        ResultSet rs = DB.getSql().queryUpdateWithKeys("INSERT INTO mails (to, from, sent, junkLevel, imapDirectory, " +
-                        "date, content) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                object.getTo(), object.getFrom(), toByte(object.isSent()), object.getJunkLevel(),
-                object.getImapDirectory(), object.getDate(), object.getContent());
+        ResultSet rs = DB.getSql().queryUpdateWithKeys("INSERT INTO mails (owner, `to`, `from`, sent, junkLevel, " +
+                        "imapDirectory, `date`, content, `read`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                object.getOwner(), object.getTo(), object.getFrom(), toByte(object.isSent()), object.getJunkLevel(),
+                object.getImapDirectory(), object.getDate(), object.getContent(), toByte(object.isRead()));
         int newid = getFirstKey(rs);
         if (newid != -1) setUsed(newid);
         return newid;
@@ -60,9 +60,10 @@ public class Mails extends DBStorage<Mail> {
     @Override
     protected void update(Mail object) {
         setUsed(object.getId());
-        DB.getSql().queryUpdate("UPDATE mails SET sent = ?, junkLevel = ?, imapDirectory = ?, date =?, content = ? " +
-                        "WHERE id = ?",
-                toByte(object.isSent()), object.getJunkLevel(), object.getDate(), object.getContent(), object.getId());
+        DB.getSql().queryUpdate("UPDATE mails SET sent = ?, junkLevel = ?, imapDirectory = ?, `date` =?," +
+                        " content = ?, `read` = ? WHERE id = ?",
+                toByte(object.isSent()), object.getJunkLevel(), object.getDate(), object.getContent(),
+                toByte(object.isRead()), object.getId());
     }
 
     @Override
@@ -72,8 +73,9 @@ public class Mails extends DBStorage<Mail> {
     }
 
     private Mail mapResultSet(ResultSet rs) throws SQLException {
-        return new Mail(rs.getInt("id"), rs.getString("from"), rs.getString("to"), toBool(rs.getByte("sent")),
-                rs.getInt("junkLevel"), rs.getString("imapDirectory"), rs.getInt("date"), rs.getBytes("content"));
+        return new Mail(rs.getInt("id"), rs.getString("owner"), rs.getString("from"), rs.getString("to"),
+                toBool(rs.getByte("sent")), rs.getInt("junkLevel"), rs.getString("imapDirectory"), rs.getInt("date"),
+                rs.getBytes("content"), toBool(rs.getByte("read")));
 
     }
 }

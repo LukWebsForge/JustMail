@@ -2,9 +2,13 @@ package de.lukweb.justmail.smtp;
 
 import de.lukweb.justmail.JustMail;
 import de.lukweb.justmail.console.JustLogger;
+import de.lukweb.justmail.crypto.CryptoUtils;
+import de.lukweb.justmail.mail.EmailAdress;
+import de.lukweb.justmail.sql.Storages;
+import de.lukweb.justmail.sql.objects.Mail;
 import de.lukweb.justmail.sql.objects.User;
-import de.lukweb.justmail.utils.CryptoUtils;
-import de.lukweb.justmail.utils.EmailAdress;
+import de.lukweb.justmail.sql.storages.Mails;
+import de.lukweb.justmail.sql.storages.Users;
 import de.lukweb.justmail.utils.interfaces.CatchStreamCallback;
 
 import javax.net.ssl.SSLSocket;
@@ -168,14 +172,53 @@ public class SmtpSession {
         this.user = user;
     }
 
+    public User getUser() {
+        return user;
+    }
+
     public boolean isAuthenticated() {
         return user != null;
     }
 
     public void save() {
         if (data == null) return;
-        JustLogger.logger().info("Recvied message from " + from.getAdress() + " to " + to.getAdress() + ". " +
-                "Data:\n " + new String(data));
+        /*
+        Concept of saving
+
+        Out means the mail isn't from this server
+        In means the mail is from this server
+
+        Out->In = Save + IMAP Notification
+        In->In = Don't connect again to this mail server. Just save it and send both a IMAP Notification
+        In->Out = Connect to the other smtpd and send the mail
+
+         */
+        Users users = Storages.get(Users.class);
+        Mails mails = Storages.get(Mails.class);
+
+        boolean existsFrom = users.exists(from.getAdress());
+        boolean existsTo = users.exists(to.getAdress());
+
+        boolean sent = false; // false means, that we received this mail
+
+        if (!existsFrom && existsTo) {
+
+        } else if (existsFrom && existsTo) {
+            mails.save(new Mail(from.getAdress(), from.getAdress(), to.getAdress(), false, 0, data));
+            // todo imap notification
+            sent = true;
+        } else if (existsFrom && !existsTo) {
+            sent = true;
+        }
+
+        if (!sent) {
+            // todo junk check & imap notification
+        }
+
+        mails.save(new Mail(to.getAdress(), from.getAdress(), to.getAdress(), sent, 0, data));
+
+        JustLogger.logger().fine("Recvied message from " + from.getAdress() + " to " + to.getAdress() + ". " +
+                "Data:\n" + new String(data));
     }
 
     public CatchStreamCallback getCallback() {

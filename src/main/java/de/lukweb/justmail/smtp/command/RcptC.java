@@ -1,11 +1,11 @@
 package de.lukweb.justmail.smtp.command;
 
+import de.lukweb.justmail.mail.EmailAdress;
 import de.lukweb.justmail.smtp.Response;
 import de.lukweb.justmail.smtp.SmtpSession;
 import de.lukweb.justmail.smtp.command.objects.SmtpCommand;
 import de.lukweb.justmail.sql.Storages;
 import de.lukweb.justmail.sql.storages.Users;
-import de.lukweb.justmail.utils.EmailAdress;
 
 public class RcptC extends SmtpCommand {
 

@@ -25,7 +25,6 @@ public abstract class DBStorage<T extends Unquie> {
                 if (time + 5 * 60 > System.currentTimeMillis() / 1000) return;
                 store.remove(id);
             });
-            // todo gc
         }, 30, 30, TimeUnit.SECONDS);
     }
 

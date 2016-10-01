@@ -21,6 +21,7 @@ public enum Response {
     COMMAND_NOT_IMPLEMENTED(502, "SmtpCommand not implemented"),
     BAD_SEQUENCE(503, "Bad sequence of commands"),
     ARGUMENT_NOT_IMPLEMENTED(504, "SmtpCommand parameter not implemented"),
+    AUTH_REQUIRED(530, "Authentication required"),
     MUST_USE_TLS(530, "Must issue a STARTTLS command first"),
     INVALID_CREDENTIALS(535, "Authentication credentials invalid"),
     MAILBOX_NOT_FOUND(550, "Mailbox counldn't be found"),

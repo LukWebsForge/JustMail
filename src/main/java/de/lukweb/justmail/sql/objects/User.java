@@ -1,7 +1,7 @@
 package de.lukweb.justmail.sql.objects;
 
+import de.lukweb.justmail.crypto.CryptoUtils;
 import de.lukweb.justmail.sql.interfaces.Unquie;
-import de.lukweb.justmail.utils.CryptoUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;

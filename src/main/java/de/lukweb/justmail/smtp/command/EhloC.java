@@ -35,6 +35,7 @@ public class EhloC extends SmtpCommand {
         ArrayList<String> supportedExtensions = new ArrayList<>();
 
         supportedExtensions.add(config.getHost() + " Hello " + domain);
+        supportedExtensions.add("8BITMIME");
         supportedExtensions.add("AUTH PLAIN");
         supportedExtensions.add("SIZE " + config.getMaxMailSize());
         if (!session.isUsingSSL()) supportedExtensions.add("STARTTLS");

@@ -1,4 +1,4 @@
-package de.lukweb.justmail.utils;
+package de.lukweb.justmail.crypto;
 
 import de.lukweb.justmail.JustMail;
 import de.lukweb.justmail.console.JustLogger;

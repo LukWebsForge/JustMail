@@ -2,19 +2,20 @@ package de.lukweb.justmail.socket;
 
 import java.net.Socket;
 
-public class MailSocketServer extends SocketServer {
+public class ImapSocketServer extends SocketServer {
 
-    public MailSocketServer(int port) {
+    public ImapSocketServer(int port) {
         super(port);
     }
 
     @Override
     protected Runnable onSocketAccepted(Socket socket) {
-        return new MailSocketHandler(socket);
+        return new ImapSocketHandler(socket);
     }
 
     @Override
     protected void onServerStop() {
-        MailSocketHandler.stopAll();
+        ImapSocketHandler.stopAll();
     }
+
 }
