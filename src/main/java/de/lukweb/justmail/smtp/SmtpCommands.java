@@ -1,7 +1,7 @@
 package de.lukweb.justmail.smtp;
 
-import de.lukweb.justmail.smtp.command.*;
-import de.lukweb.justmail.smtp.command.objects.SmtpCommand;
+import de.lukweb.justmail.smtp.commands.*;
+import de.lukweb.justmail.smtp.commands.objects.SmtpCommand;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -40,7 +40,7 @@ public class SmtpCommands {
 
         SmtpCommand command = getCommand(commandName);
         if (command == null) {
-            session.send(Response.COMMAND_UNRECOGNIZED.create());
+            session.send(SmtpResponse.COMMAND_UNRECOGNIZED.create());
             return;
         }
 

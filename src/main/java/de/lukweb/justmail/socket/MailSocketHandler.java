@@ -2,8 +2,8 @@ package de.lukweb.justmail.socket;
 
 import de.lukweb.justmail.JustMail;
 import de.lukweb.justmail.console.JustLogger;
-import de.lukweb.justmail.smtp.Response;
 import de.lukweb.justmail.smtp.SmtpCommands;
+import de.lukweb.justmail.smtp.SmtpResponse;
 import de.lukweb.justmail.smtp.SmtpSession;
 
 import java.io.DataInputStream;
@@ -41,7 +41,7 @@ public class MailSocketHandler implements Runnable {
             String ownDomain = JustMail.getInstance().getConfig().getHost();
 
             // First we send greetings
-            out.write(Response.SERVICE_READY.create(ownDomain).getBytes());
+            out.write(SmtpResponse.SERVICE_READY.create(ownDomain).getBytes());
             out.flush();
 
             boolean telnetCommand = false;
@@ -93,7 +93,7 @@ public class MailSocketHandler implements Runnable {
         if (socket == null || socket.isClosed()) return;
         try {
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-            out.writeUTF(Response.SERVICE_CLOSING.create());
+            out.writeUTF(SmtpResponse.SERVICE_CLOSING.create());
         } catch (IOException e) {
         } finally {
             try {

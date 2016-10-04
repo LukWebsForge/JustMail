@@ -4,6 +4,7 @@ import de.lukweb.justmail.config.Config;
 import de.lukweb.justmail.console.ConsoleCMDThread;
 import de.lukweb.justmail.console.JustLogger;
 import de.lukweb.justmail.crypto.KeyManager;
+import de.lukweb.justmail.socket.ImapSocketServer;
 import de.lukweb.justmail.socket.MailSocketServer;
 import de.lukweb.justmail.sql.Storages;
 import de.lukweb.justmail.sql.storages.Domains;
@@ -19,7 +20,7 @@ public class JustMail {
     private Config config;
 
     private MailSocketServer smtpServer;
-    private Thread smtpThread;
+    private ImapSocketServer imapServer;
     private Thread consoleThread;
 
     private boolean stopped;
@@ -41,9 +42,14 @@ public class JustMail {
         if (!NetUtils.isPortOpen(config.getSmtpPort())) return;
 
         smtpServer = new MailSocketServer(config.getSmtpPort());
-        smtpThread = new Thread(() -> smtpServer.start());
+        Thread smtpThread = new Thread(() -> smtpServer.start());
         smtpThread.setName("SMTP Server");
         smtpThread.start();
+
+        imapServer = new ImapSocketServer(config.getImapPort());
+        Thread imapThread = new Thread(() -> imapServer.start());
+        imapThread.setName("IMAP Server");
+        imapThread.start();
 
         consoleThread = new Thread(new ConsoleCMDThread());
         consoleThread.setName("Console Thread");
@@ -59,7 +65,8 @@ public class JustMail {
         stopped = true;
         JustLogger.logger().info("Stopping the mail server...");
         Storages.shutdown();
-        if (smtpThread != null && smtpServer != null) smtpServer.stop();
+        if (smtpServer != null) smtpServer.stop();
+        if (imapServer != null) imapServer.stop();
         if (consoleThread != null) consoleThread.interrupt();
         JustLogger.logger().info("See you next time!");
     }

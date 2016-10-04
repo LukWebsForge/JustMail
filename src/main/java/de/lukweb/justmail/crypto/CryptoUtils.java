@@ -122,10 +122,10 @@ public class CryptoUtils {
             sslSocket.startHandshake();
 
         } catch (NoSuchAlgorithmException | KeyManagementException | IOException e) {
-            System.err.println("Cannot upgrade connection from " + socket.getInetAddress().getHostAddress() + " to " +
+            JustLogger.logger().warning("Cannot upgrade connection from " + socket.getInetAddress().getHostAddress() + " to " +
                     "TLS: " + e.getMessage());
         } catch (UnrecoverableKeyException | KeyStoreException e) {
-            System.err.println("Cannot load key: " + e.getLocalizedMessage());
+            JustLogger.logger().warning("Cannot load key: " + e.getLocalizedMessage());
         }
         return null;
     }

@@ -1,6 +1,6 @@
 package de.lukweb.justmail.smtp;
 
-public enum Response {
+public enum SmtpResponse {
 
     SYSTEM_STATUS(211, "%s"),
     HELP_MESSAGE(214, "%s"),
@@ -33,7 +33,7 @@ public enum Response {
     private int code;
     private String message;
 
-    Response(int code, String message) {
+    SmtpResponse(int code, String message) {
         this.code = code;
         this.message = message;
     }
@@ -54,8 +54,8 @@ public enum Response {
 
     //////////////////////////////////////////////////
 
-    public static Response getByCode(int code) {
-        for (Response response : values()) if (response.getCode() == code) return response;
+    public static SmtpResponse getByCode(int code) {
+        for (SmtpResponse response : values()) if (response.getCode() == code) return response;
         return null;
     }
 

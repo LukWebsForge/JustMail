@@ -1,4 +1,4 @@
-package de.lukweb.justmail.smtp.command.objects;
+package de.lukweb.justmail.smtp.commands.objects;
 
 import de.lukweb.justmail.smtp.SmtpCommands;
 import de.lukweb.justmail.smtp.SmtpSession;

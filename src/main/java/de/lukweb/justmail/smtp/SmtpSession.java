@@ -121,20 +121,20 @@ public class SmtpSession {
 
     public boolean checkForHello() {
         if (domain != null && !domain.trim().isEmpty()) return true;
-        send(Response.BAD_SEQUENCE.create());
+        send(SmtpResponse.BAD_SEQUENCE.create());
         return false;
     }
 
     public boolean checkForForceSSL() {
         if (isUsingSSL()) return true;
         if (!JustMail.getInstance().getConfig().isForceSSL()) return true;
-        send(Response.MUST_USE_TLS.create());
+        send(SmtpResponse.MUST_USE_TLS.create());
         return false;
     }
 
     public boolean checkAuthentication() {
         if (isAuthenticated()) return true;
-        send(Response.BAD_SEQUENCE.create());
+        send(SmtpResponse.BAD_SEQUENCE.create());
         return false;
     }
 
@@ -217,8 +217,7 @@ public class SmtpSession {
 
         mails.save(new Mail(to.getAdress(), from.getAdress(), to.getAdress(), sent, 0, data));
 
-        JustLogger.logger().fine("Recvied message from " + from.getAdress() + " to " + to.getAdress() + ". " +
-                "Data:\n" + new String(data));
+        JustLogger.logger().fine("Recvied message from " + from.getAdress() + " to " + to.getAdress());
     }
 
     public CatchStreamCallback getCallback() {

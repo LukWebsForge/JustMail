@@ -1,9 +1,9 @@
-package de.lukweb.justmail.smtp.command;
+package de.lukweb.justmail.smtp.commands;
 
 import de.lukweb.justmail.JustMail;
-import de.lukweb.justmail.smtp.Response;
+import de.lukweb.justmail.smtp.SmtpResponse;
 import de.lukweb.justmail.smtp.SmtpSession;
-import de.lukweb.justmail.smtp.command.objects.SmtpCommand;
+import de.lukweb.justmail.smtp.commands.objects.SmtpCommand;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -19,10 +19,10 @@ public class DataC extends SmtpCommand {
         if (!session.checkForHello()) return;
         if (!session.checkForForceSSL()) return;
         if (session.getTo() == null || session.getFrom() == null) {
-            session.send(Response.BAD_SEQUENCE.create());
+            session.send(SmtpResponse.BAD_SEQUENCE.create());
             return;
         }
-        session.send(Response.START_DATA.create());
+        session.send(SmtpResponse.START_DATA.create());
         session.setReadData(true);
 
         ByteArrayOutputStream arrayOut = new ByteArrayOutputStream();
@@ -30,14 +30,14 @@ public class DataC extends SmtpCommand {
         session.setCallback(cache -> {
             if (cache.trim().equalsIgnoreCase(".")) {
                 if (arrayOut.size() > JustMail.getInstance().getConfig().getMaxMailSize()) {
-                    session.send(Response.NO_STORAGE_LEFT.create());
+                    session.send(SmtpResponse.NO_STORAGE_LEFT.create());
                 } else {
                     session.setData(arrayOut.toByteArray());
                     session.save();
-                    session.send(Response.ACTION_OKAY.create());
+                    session.send(SmtpResponse.ACTION_OKAY.create());
                 }
                 session.resetMailData();
-                session.send(Response.ACTION_OKAY.create());
+                session.send(SmtpResponse.ACTION_OKAY.create());
                 return true;
             }
             if (arrayOut.size() > JustMail.getInstance().getConfig().getMaxMailSize()) return false;

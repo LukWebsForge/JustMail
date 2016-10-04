@@ -1,8 +1,8 @@
-package de.lukweb.justmail.smtp.command;
+package de.lukweb.justmail.smtp.commands;
 
-import de.lukweb.justmail.smtp.Response;
+import de.lukweb.justmail.smtp.SmtpResponse;
 import de.lukweb.justmail.smtp.SmtpSession;
-import de.lukweb.justmail.smtp.command.objects.SmtpCommand;
+import de.lukweb.justmail.smtp.commands.objects.SmtpCommand;
 
 public class VerifyC extends SmtpCommand {
 
@@ -14,6 +14,6 @@ public class VerifyC extends SmtpCommand {
     public void execute(String[] arguments, SmtpSession session) {
         if (!session.checkForHello()) return;
         if (!session.checkForForceSSL()) return;
-        session.send(Response.COMMAND_NOT_IMPLEMENTED.create());
+        session.send(SmtpResponse.COMMAND_NOT_IMPLEMENTED.create());
     }
 }
