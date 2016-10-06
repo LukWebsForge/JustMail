@@ -2,6 +2,7 @@ package de.lukweb.justmail.socket;
 
 import de.lukweb.justmail.console.JustLogger;
 import de.lukweb.justmail.imap.ImapCommands;
+import de.lukweb.justmail.imap.ImapResponse;
 import de.lukweb.justmail.imap.ImapSession;
 
 import java.io.DataInputStream;
@@ -37,7 +38,7 @@ public class ImapSocketHandler implements Runnable {
             DataInputStream in = session.getIn();
             DataOutputStream out = session.getOut();
 
-            session.send("* OK IMAP4rev1 Service Ready");
+            session.send(ImapResponse.OK.create("*", "IMAP4rev1 Service Ready"));
 
             boolean telnetCommand = false;
 

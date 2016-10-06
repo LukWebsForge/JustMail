@@ -6,7 +6,6 @@ import de.lukweb.justmail.smtp.SmtpCommands;
 import de.lukweb.justmail.smtp.SmtpResponse;
 import de.lukweb.justmail.smtp.SmtpSession;
 
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
@@ -32,17 +31,13 @@ public class MailSocketHandler implements Runnable {
         try {
             JustLogger.logger().fine("New connection from " + socket.getInetAddress().getHostAddress());
 
-            DataInputStream in = new DataInputStream(socket.getInputStream());
-            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-
             String cache = "";
-            SmtpSession session = new SmtpSession(socket, in, out);
+            SmtpSession session = new SmtpSession(socket);
 
             String ownDomain = JustMail.getInstance().getConfig().getHost();
 
             // First we send greetings
-            out.write(SmtpResponse.SERVICE_READY.create(ownDomain).getBytes());
-            out.flush();
+            session.send(SmtpResponse.SERVICE_READY.create(ownDomain));
 
             boolean telnetCommand = false;
 
@@ -52,9 +47,7 @@ public class MailSocketHandler implements Runnable {
                 } catch (InterruptedException e) {
                     break;
                 }
-                in = session.getIn();
-                out = session.getOut();
-                int read = in.read();
+                int read = session.getIn().read();
                 if (read == -1) break;
                 if (read == 4) {
                     break;
@@ -79,10 +72,7 @@ public class MailSocketHandler implements Runnable {
                 cache = "";
             }
 
-            in.close();
-            out.close();
-
-            socket.close();
+            session.close();
 
             JustLogger.logger().fine("Closed connection from " + socket.getInetAddress().getHostAddress());
         } catch (IOException ignored) {
