@@ -1,4 +1,4 @@
-package de.lukweb.justmail.imap;
+package de.lukweb.justmail.imap.responses;
 
 public enum ImapResponse {
 

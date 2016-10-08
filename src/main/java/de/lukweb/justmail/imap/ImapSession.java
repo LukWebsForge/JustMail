@@ -1,5 +1,6 @@
 package de.lukweb.justmail.imap;
 
+import de.lukweb.justmail.imap.responses.ImapResponse;
 import de.lukweb.justmail.socket.Session;
 
 import java.io.IOException;

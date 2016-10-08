@@ -6,7 +6,6 @@ import de.lukweb.justmail.mail.EmailAdress;
 import de.lukweb.justmail.socket.Session;
 import de.lukweb.justmail.sql.Storages;
 import de.lukweb.justmail.sql.objects.Mail;
-import de.lukweb.justmail.sql.objects.User;
 import de.lukweb.justmail.sql.storages.Mails;
 import de.lukweb.justmail.sql.storages.Users;
 import de.lukweb.justmail.utils.interfaces.CatchStreamCallback;
@@ -23,8 +22,6 @@ public class SmtpSession extends Session {
 
     private boolean readData;
     private byte[] data;
-
-    private User user;
 
     private CatchStreamCallback callback;
 
@@ -112,14 +109,6 @@ public class SmtpSession extends Session {
 
     public void setCallback(CatchStreamCallback callback) {
         this.callback = callback;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public User getUser() {
-        return user;
     }
 
     public boolean isAuthenticated() {

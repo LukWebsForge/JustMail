@@ -2,6 +2,7 @@ package de.lukweb.justmail.socket;
 
 import de.lukweb.justmail.console.JustLogger;
 import de.lukweb.justmail.crypto.CryptoUtils;
+import de.lukweb.justmail.sql.objects.User;
 
 import javax.net.ssl.SSLSocket;
 import java.io.DataInputStream;
@@ -19,6 +20,8 @@ public abstract class Session {
 
     private boolean upgradingToSSL;
     protected boolean saidGoodbye;
+
+    protected User user;
 
     public Session(Socket socket) throws IOException {
         this.socket = socket;
@@ -70,6 +73,14 @@ public abstract class Session {
 
     public boolean isUsingSSL() {
         return ssl != null;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public User getUser() {
+        return user;
     }
 
     public abstract void sayGoodbye();

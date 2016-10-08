@@ -1,5 +1,6 @@
 package de.lukweb.justmail.imap.commands.objects;
 
+import de.lukweb.justmail.imap.ImapCommands;
 import de.lukweb.justmail.imap.ImapSession;
 
 public abstract class ImapCommand {
@@ -8,6 +9,7 @@ public abstract class ImapCommand {
 
     protected ImapCommand(String command) {
         this.command = command;
+        ImapCommands.registerCommand(this);
     }
 
     public String getCommand() {

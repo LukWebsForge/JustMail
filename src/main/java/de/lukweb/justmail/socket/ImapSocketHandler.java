@@ -2,8 +2,8 @@ package de.lukweb.justmail.socket;
 
 import de.lukweb.justmail.console.JustLogger;
 import de.lukweb.justmail.imap.ImapCommands;
-import de.lukweb.justmail.imap.ImapResponse;
 import de.lukweb.justmail.imap.ImapSession;
+import de.lukweb.justmail.imap.responses.ImapResponse;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
