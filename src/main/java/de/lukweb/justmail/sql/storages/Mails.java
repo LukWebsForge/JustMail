@@ -3,6 +3,7 @@ package de.lukweb.justmail.sql.storages;
 import de.lukweb.justmail.sql.DB;
 import de.lukweb.justmail.sql.DBStorage;
 import de.lukweb.justmail.sql.objects.Mail;
+import de.lukweb.justmail.sql.objects.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -46,6 +47,28 @@ public class Mails extends DBStorage<Mail> {
         return null;
     }
 
+    public List<Mail> getAll(User user) {
+        ArrayList<Mail> all = new ArrayList<>();
+        ResultSet rs = DB.getSql().querySelect("SELECT id FROM mails WHERE owner = ?", user.getFullEmail());
+        try {
+            while (rs.next()) all.add(get(rs.getInt("id")));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return all;
+    }
+
+    public int getMaxUID() {
+        ResultSet rs = DB.getSql().querySelect("SELECT MAX(id) as `max` FROM mails");
+        try {
+            if (!rs.first()) return 0;
+            return rs.getInt("max");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     @Override
     protected int insert(Mail object) {
         ResultSet rs = DB.getSql().queryUpdateWithKeys("INSERT INTO mails (owner, `to`, `from`, sent, junkLevel, " +
@@ -76,6 +99,7 @@ public class Mails extends DBStorage<Mail> {
         return new Mail(rs.getInt("id"), rs.getString("owner"), rs.getString("from"), rs.getString("to"),
                 toBool(rs.getByte("sent")), rs.getInt("junkLevel"), rs.getString("imapDirectory"), rs.getInt("date"),
                 rs.getBytes("content"), toBool(rs.getByte("read")));
-
     }
+
+
 }

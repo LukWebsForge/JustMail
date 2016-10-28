@@ -39,6 +39,36 @@ public class Config {
         if (file != null && file.exists() && file.isFile()) return;
         if (file == null) return;
         try {
+            file.createNewFile();
+            Ini ini = new Ini(file);
+
+            ini.setComment("JustMail configuration");
+
+            Section smtp = ini.get("smtp");
+            smtp.add("port", 25);
+            smtp.add("host", "example.com");
+            smtp.putComment("host", "Add other domains using the command line interface");
+
+            Section imap = ini.get("imap");
+            imap.add("port", 143);
+
+            Section database = ini.get("database");
+            database.add("salt", "ChangeMeOrTheApplicationIsVeryUnsafe");
+            database.putComment("salt", "Don't change the salt after the first user was generated, otherwise users " +
+                    "can't login!");
+            database.add("max_mail_size", "10485760");
+            database.putComment("max_mail_size", "This is the maxium size for a email, here it's 10MB.");
+
+            Section keys = ini.get("keys");
+            keys.putComment("keys", "You have to use a PKCS12 certificate, because Java has no option to load a X509 " +
+                    "keypair. laltestit");
+
+            ini.store();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
             boolean created = file.createNewFile();
             PrintWriter writer = new PrintWriter(new FileOutputStream(file), true);
 
