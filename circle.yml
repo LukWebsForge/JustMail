@@ -4,4 +4,4 @@ machine:
 test:
   override:
     - mvn package
-    - cp target/just-mail.jar $CIRCLE_ARTIFACTS/
+    - cp target/JustMail.jar $CIRCLE_ARTIFACTS/
