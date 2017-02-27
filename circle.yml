@@ -2,6 +2,8 @@ general:
   branches:
     ignore:
     - gh-pages
+  artifacts:
+    - "target/JustMail.jar"
 
 machine:
   java:
@@ -9,4 +11,3 @@ machine:
 test:
   override:
     - mvn package
-    - cp target/JustMail.jar $CIRCLE_ARTIFACTS/
