@@ -14,7 +14,7 @@ public enum ImapResponse {
     }
 
     public String create(String tag, String description) {
-        return tag + " " + text + " " + description;
+        return tag + " " + text + " " + description + "\r\n";
     }
 
 }
