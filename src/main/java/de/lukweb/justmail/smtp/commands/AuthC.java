@@ -1,6 +1,5 @@
 package de.lukweb.justmail.smtp.commands;
 
-import de.lukweb.justmail.console.JustLogger;
 import de.lukweb.justmail.smtp.SmtpResponse;
 import de.lukweb.justmail.smtp.SmtpSession;
 import de.lukweb.justmail.smtp.commands.objects.SmtpCommand;
@@ -37,35 +36,35 @@ public class AuthC extends SmtpCommand {
                     authenticateUser(session, arguments[1]);
                 }
                 return;
-            }else if(arguments[0].equalsIgnoreCase("LOGIN")) {
-                if(arguments.length == 1) {
+            } else if (arguments[0].equalsIgnoreCase("LOGIN")) {
+                if (arguments.length == 1) {
                     //Username:
                     session.send(SmtpResponse.CONTINE_AUTH.customMessage("VXNlcm5hbWU6"));
                     session.setCallback(username -> {
                         //Password:
                         session.send(SmtpResponse.CONTINE_AUTH.customMessage("UGFzc3dvcmQ6"));
                         session.setCallback(password -> {
-                            String auth = Base64.getEncoder().encodeToString(("\0" + new String(Base64.getDecoder().decode(username.trim()),StandardCharsets.UTF_8)
-                                    + "\0" + new String(Base64.getDecoder().decode(password.trim()),StandardCharsets.UTF_8))
+                            String auth = Base64.getEncoder().encodeToString(("\0" + new String(Base64.getDecoder().decode(username.trim()), StandardCharsets.UTF_8)
+                                    + "\0" + new String(Base64.getDecoder().decode(password.trim()), StandardCharsets.UTF_8))
                                     .getBytes(StandardCharsets.UTF_8));
                             authenticateUser(session, auth);
                             return true;
                         });
                         return false;
                     });
-                }else{
+                } else {
                     //Password:
                     session.send(SmtpResponse.CONTINE_AUTH.customMessage("UGFzc3dvcmQ6"));
                     session.setCallback(password -> {
-                        String auth = Base64.getEncoder().encodeToString(("\0" + new String(Base64.getDecoder().decode(arguments[1].trim()),StandardCharsets.UTF_8)
-                                + "\0" + new String(Base64.getDecoder().decode(password.trim()),StandardCharsets.UTF_8))
+                        String auth = Base64.getEncoder().encodeToString(("\0" + new String(Base64.getDecoder().decode(arguments[1].trim()), StandardCharsets.UTF_8)
+                                + "\0" + new String(Base64.getDecoder().decode(password.trim()), StandardCharsets.UTF_8))
                                 .getBytes(StandardCharsets.UTF_8));
                         authenticateUser(session, auth);
                         return true;
                     });
                 }
                 return;
-            }else{
+            } else {
                 session.send(SmtpResponse.AUTH_NOT_IMPLEMENTED.create());
             }
         }

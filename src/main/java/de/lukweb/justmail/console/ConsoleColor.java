@@ -27,7 +27,7 @@ public enum ConsoleColor {
             case UNIX:
                 return "\u001B[";
             case WINDOWS:
-                return (char)27 + "[";
+                return (char) 27 + "[";
             default:
                 return getEnvPrefix(Environment.UNIX);
         }

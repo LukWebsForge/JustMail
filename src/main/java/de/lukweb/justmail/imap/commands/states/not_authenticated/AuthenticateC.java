@@ -12,18 +12,20 @@ import de.lukweb.justmail.sql.storages.Users;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-public class AuthenticateC extends ImapCommand{
+public class AuthenticateC extends ImapCommand {
 
-    public AuthenticateC() { super("authenticate"); }
+    public AuthenticateC() {
+        super("authenticate");
+    }
 
     @Override
     public void execute(String[] arguments, String tag, ImapSession session) {
-        if(arguments.length < 1){
+        if (arguments.length < 1) {
             session.send(ImapPredefinedResponse.BAD_INVALID_ARGUMENTS.create(tag));
             return;
         }
 
-        if(arguments[0].equalsIgnoreCase("PLAIN")){
+        if (arguments[0].equalsIgnoreCase("PLAIN")) {
             if (arguments.length == 1) {
                 session.send("+ \r\n");
                 session.setCallback(cache -> {
@@ -35,8 +37,8 @@ public class AuthenticateC extends ImapCommand{
                 authenticateUser(session, arguments[1], tag);
             }
             return;
-        }else if(arguments[0].equalsIgnoreCase("LOGIN")){
-            if(arguments.length == 1) {
+        } else if (arguments[0].equalsIgnoreCase("LOGIN")) {
+            if (arguments.length == 1) {
                 //Username:
                 session.send("+ VXNlcm5hbWU6\r\n");
                 session.setCallback(username -> {
@@ -44,33 +46,33 @@ public class AuthenticateC extends ImapCommand{
                     session.send("+ UGFzc3dvcmQ6\r\n");
                     session.setCallback(password -> {
                         String auth = Base64.getEncoder().encodeToString(("\0" + new String(Base64.getDecoder().decode(username.trim()), StandardCharsets.UTF_8)
-                                + "\0" + new String(Base64.getDecoder().decode(password.trim()),StandardCharsets.UTF_8))
+                                + "\0" + new String(Base64.getDecoder().decode(password.trim()), StandardCharsets.UTF_8))
                                 .getBytes(StandardCharsets.UTF_8));
                         authenticateUser(session, auth, tag);
                         return true;
                     });
                     return false;
                 });
-            }else{
+            } else {
                 //Password:
                 session.send("+ UGFzc3dvcmQ6\r\n");
                 session.setCallback(password -> {
-                    String auth = Base64.getEncoder().encodeToString(("\0" + new String(Base64.getDecoder().decode(arguments[1].trim()),StandardCharsets.UTF_8)
-                            + "\0" + new String(Base64.getDecoder().decode(password.trim()),StandardCharsets.UTF_8))
+                    String auth = Base64.getEncoder().encodeToString(("\0" + new String(Base64.getDecoder().decode(arguments[1].trim()), StandardCharsets.UTF_8)
+                            + "\0" + new String(Base64.getDecoder().decode(password.trim()), StandardCharsets.UTF_8))
                             .getBytes(StandardCharsets.UTF_8));
                     authenticateUser(session, auth, tag);
                     return true;
                 });
             }
-        }else{
-            session.send(ImapResponse.BAD.create(tag,"Unrecognized authentication type"));
+        } else {
+            session.send(ImapResponse.BAD.create(tag, "Unrecognized authentication type"));
         }
     }
 
     private void authenticateUser(ImapSession session, String plain, String tag) {
         User user = Storages.get(Users.class).getByBase64(plain.trim());
         if (user == null) {
-            session.send(ImapResponse.NO.create(tag,"Authentication credentials invalid"));
+            session.send(ImapResponse.NO.create(tag, "Authentication credentials invalid"));
             return;
         }
         session.setUser(user);
