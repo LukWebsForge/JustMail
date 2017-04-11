@@ -27,7 +27,7 @@ public class AuthenticateC extends ImapCommand {
 
         if (arguments[0].equalsIgnoreCase("PLAIN")) {
             if (arguments.length == 1) {
-                session.send("+ \r\n");
+                session.send("+ ");
                 session.setCallback(cache -> {
                     JustLogger.logger().info(cache);
                     authenticateUser(session, cache, tag);
@@ -40,10 +40,10 @@ public class AuthenticateC extends ImapCommand {
         } else if (arguments[0].equalsIgnoreCase("LOGIN")) {
             if (arguments.length == 1) {
                 //Username:
-                session.send("+ VXNlcm5hbWU6\r\n");
+                session.send("+ VXNlcm5hbWU6");
                 session.setCallback(username -> {
                     //Password:
-                    session.send("+ UGFzc3dvcmQ6\r\n");
+                    session.send("+ UGFzc3dvcmQ6");
                     session.setCallback(password -> {
                         String auth = Base64.getEncoder().encodeToString(("\0" + new String(Base64.getDecoder().decode(username.trim()), StandardCharsets.UTF_8)
                                 + "\0" + new String(Base64.getDecoder().decode(password.trim()), StandardCharsets.UTF_8))
@@ -55,7 +55,7 @@ public class AuthenticateC extends ImapCommand {
                 });
             } else {
                 //Password:
-                session.send("+ UGFzc3dvcmQ6\r\n");
+                session.send("+ UGFzc3dvcmQ6");
                 session.setCallback(password -> {
                     String auth = Base64.getEncoder().encodeToString(("\0" + new String(Base64.getDecoder().decode(arguments[1].trim()), StandardCharsets.UTF_8)
                             + "\0" + new String(Base64.getDecoder().decode(password.trim()), StandardCharsets.UTF_8))

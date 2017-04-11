@@ -65,7 +65,7 @@ public class AuthC extends SmtpCommand {
                 }
                 return;
             } else {
-                session.send(SmtpResponse.AUTH_NOT_IMPLEMENTED.create());
+                session.send(SmtpResponse.ARGUMENT_NOT_IMPLEMENTED.create());
             }
         }
         session.send(SmtpResponse.ARGUMENT_ERROR.create());
