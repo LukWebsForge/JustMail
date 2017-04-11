@@ -65,16 +65,16 @@ public class ImapSocketHandler implements Runnable {
                 }
                 cache += (char) read;
                 if (!(cache.endsWith("\n\r") || cache.endsWith("\n"))) continue;
-                /* if (session.getCallback() != null) {
+                if (session.getCallback() != null) {
                     boolean breakCB = session.getCallback().callback(cache);
                     if (breakCB) session.setCallback(null);
                     cache = "";
                     continue;
-                } */
-                String[] split = cache.split(" ", 1);
+                }
+                String[] split = cache.split(" ", 2);
                 // We reject this because there's no tag or something else, but it's not okay
                 if (split.length < 2) {
-                    // todo send bad synatx
+                    // todo send bad syntax
                     continue;
                 }
 

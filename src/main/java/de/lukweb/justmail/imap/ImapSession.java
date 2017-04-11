@@ -3,6 +3,7 @@ package de.lukweb.justmail.imap;
 import de.lukweb.justmail.imap.responses.ImapResponse;
 import de.lukweb.justmail.socket.Session;
 import de.lukweb.justmail.sql.objects.User;
+import de.lukweb.justmail.utils.interfaces.CatchStreamCallback;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -11,6 +12,8 @@ public class ImapSession extends Session {
 
     private User user;
     private String selectedMailbox;
+
+    private CatchStreamCallback callback;
 
     public ImapSession(Socket socket) throws IOException {
         super(socket);
@@ -43,6 +46,14 @@ public class ImapSession extends Session {
     @Override
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public CatchStreamCallback getCallback() {
+        return callback;
+    }
+
+    public void setCallback(CatchStreamCallback callback) {
+        this.callback = callback;
     }
 
     public String getSelectedMailbox() {

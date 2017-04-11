@@ -44,22 +44,22 @@ public class Config {
 
             ini.setComment("JustMail configuration");
 
-            Section smtp = ini.get("smtp");
+            Section smtp = ini.add("smtp");
             smtp.add("port", 25);
             smtp.add("host", "example.com");
             smtp.putComment("host", "Add other domains using the command line interface");
 
-            Section imap = ini.get("imap");
+            Section imap = ini.add("imap");
             imap.add("port", 143);
 
-            Section database = ini.get("database");
+            Section database = ini.add("database");
             database.add("salt", "ChangeMeOrTheApplicationIsVeryUnsafe");
             database.putComment("salt", "Don't change the salt after the first user was generated, otherwise users " +
                     "can't login!");
             database.add("max_mail_size", "10485760");
             database.putComment("max_mail_size", "This is the maxium size for a email, here it's 10MB.");
 
-            Section keys = ini.get("keys");
+            Section keys = ini.add("keys");
             keys.putComment("keys", "You have to use a PKCS12 certificate, because Java has no option to load a X509 " +
                     "keypair. laltestit");
 

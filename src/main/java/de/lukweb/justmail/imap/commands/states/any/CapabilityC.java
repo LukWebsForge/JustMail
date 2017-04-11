@@ -12,8 +12,8 @@ public class CapabilityC extends ImapCommand {
 
     @Override
     public void execute(String[] arguments, String tag, ImapSession session) {
-        session.send(ImapResponse.OK.create("*", "CAPABILITY IMAP4rev1 STARTTLS AUTH=PLAIN"));
-        session.send(ImapResponse.OK.create(tag, "OK CAPABILITY completed"));
+        session.send(ImapResponse.OK.create("*", "CAPABILITY IMAP4rev1 STARTTLS SASL-IR AUTH=PLAIN AUTH=LOGIN"));
+        session.send(ImapResponse.OK.create(tag, "CAPABILITY completed"));
     }
 
 }
