@@ -30,6 +30,12 @@ public class ImapSession extends Session {
     }
 
     @Override
+    public void send(String response) {
+        response += "\r\n";
+        super.send(response);
+    }
+
+    @Override
     public User getUser() {
         return user;
     }
