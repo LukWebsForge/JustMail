@@ -3,6 +3,7 @@ package de.lukweb.justmail.socket;
 import de.lukweb.justmail.console.JustLogger;
 import de.lukweb.justmail.crypto.CryptoUtils;
 import de.lukweb.justmail.sql.objects.User;
+import de.lukweb.justmail.utils.interfaces.CatchStreamCallback;
 
 import javax.net.ssl.SSLSocket;
 import java.io.DataInputStream;
@@ -22,6 +23,7 @@ public abstract class Session {
     protected boolean saidGoodbye;
 
     protected User user;
+    private CatchStreamCallback callback;
 
     public Session(Socket socket) throws IOException {
         this.socket = socket;
@@ -43,7 +45,7 @@ public abstract class Session {
             out.write(response.getBytes());
             out.flush();
         } catch (IOException e) {
-            if (e instanceof SocketException && e.getMessage().toLowerCase().contains("broken pipe")) {
+            if (e instanceof SocketException) {
                 JustLogger.logger().fine("Server from " + socket.getInetAddress().getHostAddress() + " closed " +
                         "connection!");
                 close();
@@ -73,6 +75,14 @@ public abstract class Session {
 
     public boolean isUsingSSL() {
         return ssl != null;
+    }
+
+    public CatchStreamCallback getCallback() {
+        return callback;
+    }
+
+    public void setCallback(CatchStreamCallback callback) {
+        this.callback = callback;
     }
 
     public void setUser(User user) {

@@ -4,10 +4,8 @@ import de.lukweb.justmail.console.commands.objects.ConsoleCommand;
 import de.lukweb.justmail.console.commands.objects.ConsoleCommands;
 import de.lukweb.justmail.utils.interfaces.CatchStreamCallback;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.Scanner;
 import java.util.logging.Level;
 
 public class ConsoleCMDThread implements Runnable {
@@ -25,14 +23,9 @@ public class ConsoleCMDThread implements Runnable {
     }
 
     public void run() {
-        BufferedReader bufferReader = new BufferedReader(new InputStreamReader(System.in));
-        String line;
-        while (!Thread.currentThread().isInterrupted()) {
-            try {
-                line = bufferReader.readLine();
-            } catch (IOException e) {
-                return;
-            }
+        Scanner scanner = new Scanner(System.in);
+        while (!Thread.currentThread().isInterrupted() && scanner.hasNext()) {
+            String line = scanner.nextLine();
             if (line == null) {
                 return;
             }

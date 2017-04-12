@@ -9,6 +9,8 @@ import de.lukweb.justmail.sql.Storages;
 import de.lukweb.justmail.sql.objects.User;
 import de.lukweb.justmail.sql.storages.Users;
 
+import java.util.Arrays;
+
 public class LoginC extends ImapCommand {
 
     public LoginC() {
@@ -25,10 +27,10 @@ public class LoginC extends ImapCommand {
         Users users = Storages.get(Users.class);
 
         String name = arguments[0];
-        String password = CryptoUtils.generateSHA512Password(arguments[1]);
+        byte[] password = CryptoUtils.generateSHA512Password(arguments[1].toCharArray());
 
         User user = users.getByMail(name);
-        if (user == null || !user.getHashedPassword().equals(password)) {
+        if (user == null || !Arrays.equals(user.getPasswords().getPassword(), password)) {
             session.send(ImapResponse.BAD.create(tag, "user cannot be found or the password is incorrect"));
             return;
         }

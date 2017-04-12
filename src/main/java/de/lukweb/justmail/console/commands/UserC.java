@@ -26,7 +26,7 @@ public class UserC implements ConsoleCommand {
 
     @Override
     public String getSyntax() {
-        return "user [add <email> <password> | list | status <username> | changepw <email> <newpassword> | remove " +
+        return "user [add <email> <password> | list | status <email> | changepw <email> <newpassword> | remove " +
                 "<email>]";
     }
 
@@ -49,7 +49,7 @@ public class UserC implements ConsoleCommand {
                     JustLogger.logger().warning("Cannot find the domain \"" + domainStr + "\"");
                     break;
                 }
-                User user = new User(args[1].split("@")[0], domain, args[2]);
+                User user = new User(args[1].split("@")[0], domain, args[2].toCharArray());
                 users.save(user);
                 JustLogger.logger().info("Created user \"" + args[1] + "\" with ID " + user.getId());
                 break;
@@ -59,7 +59,7 @@ public class UserC implements ConsoleCommand {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
                 for (User user : users.getAll())
                     list += "User: " + user.getFullEmail() + "; ID: " + user.getId() + "; Created: " +
-                            sdf.format(new Date(user.getCreated())) + "\n";
+                            sdf.format(new Date(user.getCreated() * 1000)) + "\n";
                 JustLogger.logger().info(list);
                 break;
             }
@@ -70,14 +70,14 @@ public class UserC implements ConsoleCommand {
                 }
                 User user = users.getByMail(args[1]);
                 if (user == null) {
-                    JustLogger.logger().warning("A user with the email \"" + args[0] + "\" can't be found!");
+                    JustLogger.logger().warning("A user with the email \"" + args[1] + "\" can't be found!");
                     return;
                 }
                 SimpleDateFormat sdf = new SimpleDateFormat("HH:mm dd-MMM-yyyy");
                 String text = "\n <<< User Status >>> \n";
-                text += "EMail adress: " + user.getFullEmail() + "\n";
+                text += "Email adress: " + user.getFullEmail() + "\n";
                 text += "ID: " + user.getId() + "\n";
-                text += "Created: " + sdf.format(new Date(user.getCreated())) + "\n";
+                text += "Created: " + sdf.format(new Date(user.getCreated() * 1000)) + "\n";
                 JustLogger.logger().info(text);
                 break;
             }
@@ -91,7 +91,7 @@ public class UserC implements ConsoleCommand {
                     JustLogger.logger().warning("Cannot find user with e-mail-adress \"" + args[1] + "\"");
                     break;
                 }
-                user.setPassword(args[2]);
+                user.getPasswords().setPassword(args[2].toCharArray());
                 JustLogger.logger().info("The password for the user " + user.getFullEmail() + " was changed " +
                         "successfully!");
                 break;

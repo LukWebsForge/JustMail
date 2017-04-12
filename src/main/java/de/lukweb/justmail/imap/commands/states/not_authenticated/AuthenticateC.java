@@ -1,6 +1,7 @@
 package de.lukweb.justmail.imap.commands.states.not_authenticated;
 
 import de.lukweb.justmail.console.JustLogger;
+import de.lukweb.justmail.crypto.CryptoUtils;
 import de.lukweb.justmail.imap.ImapSession;
 import de.lukweb.justmail.imap.commands.objects.ImapCommand;
 import de.lukweb.justmail.imap.responses.ImapPredefinedResponse;
@@ -70,7 +71,7 @@ public class AuthenticateC extends ImapCommand {
     }
 
     private void authenticateUser(ImapSession session, String plain, String tag) {
-        User user = Storages.get(Users.class).getByBase64(plain.trim());
+        User user = Storages.get(Users.class).getByBase64(new String(CryptoUtils.generateSHA512Password(plain.trim().toCharArray())));
         if (user == null) {
             session.send(ImapResponse.NO.create(tag, "Authentication credentials invalid"));
             return;

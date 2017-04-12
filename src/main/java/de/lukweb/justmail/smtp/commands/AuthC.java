@@ -1,5 +1,6 @@
 package de.lukweb.justmail.smtp.commands;
 
+import de.lukweb.justmail.crypto.CryptoUtils;
 import de.lukweb.justmail.smtp.SmtpResponse;
 import de.lukweb.justmail.smtp.SmtpSession;
 import de.lukweb.justmail.smtp.commands.objects.SmtpCommand;
@@ -72,7 +73,7 @@ public class AuthC extends SmtpCommand {
     }
 
     private void authenticateUser(SmtpSession session, String plain) {
-        User user = Storages.get(Users.class).getByBase64(plain.trim());
+        User user = Storages.get(Users.class).getByBase64(new String(CryptoUtils.generateSHA512Password(plain.trim().toCharArray())));
         if (user == null) {
             session.send(SmtpResponse.INVALID_CREDENTIALS.create());
             return;
