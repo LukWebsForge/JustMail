@@ -3,11 +3,14 @@ package de.lukweb.justmail.sql.storages;
 import de.lukweb.justmail.sql.DB;
 import de.lukweb.justmail.sql.DBStorage;
 import de.lukweb.justmail.sql.Storages;
+import de.lukweb.justmail.sql.objects.Password;
 import de.lukweb.justmail.sql.objects.User;
 
+import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Users extends DBStorage<User> {
@@ -19,11 +22,16 @@ public class Users extends DBStorage<User> {
 
     private void loadAll() {
         try {
-            ResultSet rs = DB.getSql().querySelect("SELECT * FROM users");
+            ResultSet rs = DB.getSql().querySelect("SELECT users.*, passwords.* FROM users LEFT JOIN passwords " +
+                    "ON users.id = passwords.userid");
             Domains domains = Storages.get(Domains.class);
-            while (rs.next()) store.put(rs.getInt("id"), new User(rs.getInt("id"), rs.getString("username"),
-                    domains.get(rs.getInt("domain")), rs.getString("fullEmail"), rs.getString("password"),
-                    rs.getBytes("base64up"), rs.getInt("created")));
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                Password password = new Password(rs.getBytes("password"), rs.getBytes("base64"));
+                User user = new User(id, rs.getString("username"), domains.get(rs.getInt("domain")), rs.getString
+                        ("fullEmail"), password, rs.getInt("created"));
+                store.put(id, user);
+            }
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -40,7 +48,8 @@ public class Users extends DBStorage<User> {
     }
 
     public User getByBase64(String base64up) {
-        for (User user : store.values()) if (user.getBase64UsernamePassword().trim().equals(base64up)) return user;
+        byte[] base64 = base64up.trim().getBytes(StandardCharsets.UTF_8);
+        for (User user : store.values()) if (Arrays.equals(user.getPasswords().getBase64(), base64)) return user;
         return null;
     }
 
@@ -55,20 +64,22 @@ public class Users extends DBStorage<User> {
 
     @Override
     protected int insert(User object) {
-        ResultSet rs = DB.getSql().queryUpdateWithKeys("INSERT INTO users (username, domain, fullEmail, password, " +
-                        "base64up, created) VALUES (?, ?, ?, ?, ?, ?)", object.getUsername(), object.getDomain()
-                        .getId(),
-                object.getFullEmail(), object.getHashedPassword(), object.getEncryptedBase64UP(),
-                object.getCreated());
-        return getFirstKey(rs);
+        ResultSet rs = DB.getSql().queryUpdateWithKeys(
+                "INSERT INTO users (username, domain, fullEmail, created) VALUES (?, ?, ?, ?)",
+                object.getUsername(), object.getDomain().getId(),
+                object.getFullEmail(), object.getCreated());
+        int id = getFirstKey(rs);
+        DB.getSql().queryUpdate("INSERT INTO passwords (userid, password, base64) VALUES (?, ?, ?)",
+                id, object.getPasswords().getPassword(), object.getPasswords().getBase64());
+        return id;
     }
 
     @Override
     protected void update(User object) {
-        DB.getSql().queryUpdate("UPDATE users username = ?, domain = ?, fullEmail = ?, password = ?, base64up = ? " +
-                        "WHERE id = ?",
-                object.getUsername(), object.getDomain().getId(), object.getFullEmail(), object.getHashedPassword(),
-                object.getEncryptedBase64UP(), object.getId());
+        DB.getSql().queryUpdate("UPDATE users SET username = ?, domain = ?, fullEmail = ? WHERE id = ?",
+                object.getUsername(), object.getDomain().getId(), object.getFullEmail(), object.getId());
+        DB.getSql().queryUpdate("UPDATE passwords SET password = ?, base64 = ?",
+                object.getPasswords().getPassword(), object.getPasswords().getBase64());
     }
 
     @Override

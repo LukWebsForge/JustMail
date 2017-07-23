@@ -30,7 +30,7 @@ public class ImapSocketHandler implements Runnable {
     public void run() {
         if (Thread.currentThread().isInterrupted()) return;
         try {
-            JustLogger.logger().fine("New connection from " + socket.getInetAddress().getHostAddress());
+            JustLogger.logger().fine("New connection (IMAP) from " + socket.getInetAddress().getHostAddress());
 
             String cache = "";
             ImapSession session = new ImapSession(socket);
@@ -43,11 +43,12 @@ public class ImapSocketHandler implements Runnable {
             boolean telnetCommand = false;
 
             while (!Thread.currentThread().isInterrupted()) {
-                /* if (session.isUpgradingToSSL()) try {
+                if (session.isUpgradingToSSL()) try {
                     Thread.sleep(1);
+                    continue;
                 } catch (InterruptedException e) {
                     break;
-                } */
+                }
                 in = session.getIn();
                 out = session.getOut();
                 int read = in.read();
@@ -75,6 +76,7 @@ public class ImapSocketHandler implements Runnable {
                 // We reject this because there's no tag or something else, but it's not okay
                 if (split.length < 2) {
                     // todo send bad syntax
+                    cache = "";
                     continue;
                 }
 

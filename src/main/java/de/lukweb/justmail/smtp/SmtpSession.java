@@ -8,7 +8,6 @@ import de.lukweb.justmail.sql.Storages;
 import de.lukweb.justmail.sql.objects.Mail;
 import de.lukweb.justmail.sql.storages.Mails;
 import de.lukweb.justmail.sql.storages.Users;
-import de.lukweb.justmail.utils.interfaces.CatchStreamCallback;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -22,8 +21,6 @@ public class SmtpSession extends Session {
 
     private boolean readData;
     private byte[] data;
-
-    private CatchStreamCallback callback;
 
     public SmtpSession(Socket socket) throws IOException {
         super(socket);
@@ -101,14 +98,6 @@ public class SmtpSession extends Session {
 
     public void setDomain(String domain) {
         this.domain = domain;
-    }
-
-    public CatchStreamCallback getCallback() {
-        return callback;
-    }
-
-    public void setCallback(CatchStreamCallback callback) {
-        this.callback = callback;
     }
 
     public boolean isAuthenticated() {

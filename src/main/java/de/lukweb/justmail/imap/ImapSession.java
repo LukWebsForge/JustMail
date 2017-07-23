@@ -2,21 +2,26 @@ package de.lukweb.justmail.imap;
 
 import de.lukweb.justmail.imap.responses.ImapResponse;
 import de.lukweb.justmail.socket.Session;
+import de.lukweb.justmail.sql.objects.Mailbox;
 import de.lukweb.justmail.sql.objects.User;
 import de.lukweb.justmail.utils.interfaces.CatchStreamCallback;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ImapSession extends Session {
 
     private User user;
-    private String selectedMailbox;
+    private Mailbox selected;
+    private List<Mailbox> subscribed;
 
     private CatchStreamCallback callback;
 
     public ImapSession(Socket socket) throws IOException {
         super(socket);
+        this.subscribed = new ArrayList<>();
     }
 
     @Override
@@ -29,6 +34,12 @@ public class ImapSession extends Session {
     public boolean checkForAuthentication(String tag) {
         if (user != null) return true;
         send(ImapResponse.NO.create(tag, "Not authenticated"));
+        return false;
+    }
+
+    public boolean checkForExistence(String tag, Mailbox mailbox) {
+        if (mailbox != null) return true;
+        send(ImapResponse.NO.create(tag, "Mailbox doesn't exists"));
         return false;
     }
 
@@ -56,11 +67,23 @@ public class ImapSession extends Session {
         this.callback = callback;
     }
 
-    public String getSelectedMailbox() {
-        return selectedMailbox;
+    public Mailbox getSelected() {
+        return selected;
     }
 
-    public void setSelectedMailbox(String selectedMailbox) {
-        this.selectedMailbox = selectedMailbox;
+    public void setSelected(Mailbox selected) {
+        this.selected = selected;
+    }
+
+    public void addSubscribed(Mailbox mailbox) {
+        this.subscribed.add(mailbox);
+    }
+
+    public void removeSubscribed(Mailbox mailbox) {
+        this.subscribed.remove(mailbox);
+    }
+
+    public List<Mailbox> getSubscribed() {
+        return subscribed;
     }
 }

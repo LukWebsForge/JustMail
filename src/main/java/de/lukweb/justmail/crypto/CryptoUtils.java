@@ -2,17 +2,29 @@ package de.lukweb.justmail.crypto;
 
 import de.lukweb.justmail.JustMail;
 import de.lukweb.justmail.console.JustLogger;
+import de.lukweb.justmail.utils.StringUtils;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
-import javax.net.ssl.*;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.security.*;
+import java.security.InvalidKeyException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -20,24 +32,19 @@ import java.util.function.Consumer;
 
 public class CryptoUtils {
 
-    public static String generateSHA512Password(String password) {
-        return generateSHA512Password(password, JustMail.getInstance().getConfig().getSalt().getBytes
-                (StandardCharsets.UTF_8));
+    public static byte[] generateSHA512Password(char[] password) {
+        return generateSHA512Password(password, JustMail.getInstance().getConfig().getSalt().getBytes(StandardCharsets.UTF_8));
     }
 
-    public static String generateSHA512Password(String password, byte[] salt) {
-        String generatedPassword = null;
+    public static byte[] generateSHA512Password(char[] password, byte[] salt) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-512");
             md.update(salt);
-            byte[] bytes = md.digest(password.getBytes(StandardCharsets.UTF_8));
-            StringBuilder sb = new StringBuilder();
-            for (byte aByte : bytes) sb.append(Integer.toString((aByte & 0xff) + 0x100, 16).substring(1));
-            generatedPassword = sb.toString();
+            return md.digest(StringUtils.toBytes(password));
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
-        return generatedPassword;
+        return new byte[]{};
     }
 
     private static Cipher aes;

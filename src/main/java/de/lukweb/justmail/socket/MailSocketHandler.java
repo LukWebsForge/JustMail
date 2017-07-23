@@ -29,7 +29,7 @@ public class MailSocketHandler implements Runnable {
     public void run() {
         if (Thread.currentThread().isInterrupted()) return;
         try {
-            JustLogger.logger().fine("New connection from " + socket.getInetAddress().getHostAddress());
+            JustLogger.logger().fine("New connection (SMTP) from " + socket.getInetAddress().getHostAddress());
 
             String cache = "";
             SmtpSession session = new SmtpSession(socket);
@@ -44,6 +44,7 @@ public class MailSocketHandler implements Runnable {
             while (!Thread.currentThread().isInterrupted()) {
                 if (session.isUpgradingToSSL()) try {
                     Thread.sleep(1);
+                    continue;
                 } catch (InterruptedException e) {
                     break;
                 }

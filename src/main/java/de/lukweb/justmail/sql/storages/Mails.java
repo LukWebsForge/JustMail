@@ -83,7 +83,7 @@ public class Mails extends DBStorage<Mail> {
     @Override
     protected void update(Mail object) {
         setUsed(object.getId());
-        DB.getSql().queryUpdate("UPDATE mails SET sent = ?, junkLevel = ?, imapDirectory = ?, `date` =?," +
+        DB.getSql().queryUpdate("UPDATE mails SET sent = ?, junkLevel = ?, imapDirectory = ?, `date` = ?," +
                         " content = ?, `read` = ? WHERE id = ?",
                 toByte(object.isSent()), object.getJunkLevel(), object.getDate(), object.getContent(),
                 toByte(object.isRead()), object.getId());

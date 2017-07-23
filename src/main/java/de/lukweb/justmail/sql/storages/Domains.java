@@ -30,8 +30,8 @@ public class Domains extends DBStorage<Domain> {
         }
         String host = JustMail.getInstance().getConfig().getHost();
         if (get(host) == null) {
-            insert(new Domain(-1, host, true));
-            JustLogger.logger().info("Created a domin for the host domain.");
+            save(new Domain(-1, host, true));
+            JustLogger.logger().info("Created a domain for the host domain.");
         }
     }
 

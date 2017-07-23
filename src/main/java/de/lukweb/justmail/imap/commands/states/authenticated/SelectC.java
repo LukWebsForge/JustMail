@@ -25,7 +25,6 @@ public class SelectC extends ImapCommand {
         Mails mails = Storages.get(Mails.class);
         List<Mail> userMail = mails.getAll(session.getUser());
 
-
         Stream<Mail> unreadMails = userMail.stream().filter(mail -> !mail.isRead())
                 .sorted((o1, o2) -> o1.getId() > o2.getId() ? 1 : -1);
         Optional<Mail> firstUnread = unreadMails.findFirst();
@@ -33,8 +32,8 @@ public class SelectC extends ImapCommand {
         session.send("* " + userMail.size() + " EXISTS");
         session.send("* " + unreadMails.count() + " RECENT");
 
-        if (firstUnread.isPresent()) session.send(ImapResponse.OK.create("*", "[UNSEEND " + firstUnread.get().getId() +
-                "] Message " + firstUnread.get().getId() + " is first unseen"));
+        firstUnread.ifPresent(mail -> session.send(ImapResponse.OK.create("*", "[UNSEEND " + mail.getId() +
+                "] Message " + mail.getId() + " is first unseen")));
 
         session.send(ImapResponse.OK.create("*", "[UIDVALIDITY 3857529045] UIDs valid"));
         session.send(ImapResponse.OK.create("*", "[UIDNEXT " + mails.getMaxUID() + 1 + "] Predicted next UID"));

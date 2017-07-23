@@ -1,6 +1,7 @@
 package de.lukweb.justmail.sql;
 
 import de.lukweb.justmail.sql.storages.Domains;
+import de.lukweb.justmail.sql.storages.Mailboxes;
 import de.lukweb.justmail.sql.storages.Mails;
 import de.lukweb.justmail.sql.storages.Users;
 
@@ -18,6 +19,7 @@ public class Storages {
         new Domains();
         new Mails();
         new Users();
+        new Mailboxes();
     }
 
     static void register(Class<?> clazz, DBStorage storage) {
