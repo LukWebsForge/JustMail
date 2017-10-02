@@ -94,6 +94,7 @@ public class UserC implements ConsoleCommand {
                 user.getPasswords().setPassword(args[2].toCharArray());
                 JustLogger.logger().info("The password for the user " + user.getFullEmail() + " was changed " +
                         "successfully!");
+                users.save(user);
                 break;
             }
             case "remove": {

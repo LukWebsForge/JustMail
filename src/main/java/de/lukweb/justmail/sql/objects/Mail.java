@@ -22,7 +22,7 @@ public class Mail implements Unquie {
         this.to = to;
         this.sent = sent;
         this.junkLevel = junkLevel;
-        this.imapDirectory = "unread"; // todo change this
+        this.imapDirectory = "inbox"; // todo change this
         this.date = (int) (System.currentTimeMillis() / 1000);
         this.content = content;
         this.read = false;

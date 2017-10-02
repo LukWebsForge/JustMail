@@ -3,6 +3,7 @@ package de.lukweb.justmail.sql.storages;
 import de.lukweb.justmail.sql.DB;
 import de.lukweb.justmail.sql.DBStorage;
 import de.lukweb.justmail.sql.objects.Mail;
+import de.lukweb.justmail.sql.objects.Mailbox;
 import de.lukweb.justmail.sql.objects.User;
 
 import java.sql.ResultSet;
@@ -47,6 +48,17 @@ public class Mails extends DBStorage<Mail> {
         return null;
     }
 
+    public List<Mail> getAll(Mailbox mailbox) {
+        ArrayList<Mail> all = new ArrayList<>();
+        ResultSet rs = DB.getSql().querySelect("SELECT id FROM mails WHERE imapDirectory = ?", mailbox);
+        try {
+            while (rs.next()) all.add(get(rs.getInt("id")));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return all;
+    }
+
     public List<Mail> getAll(User user) {
         ArrayList<Mail> all = new ArrayList<>();
         ResultSet rs = DB.getSql().querySelect("SELECT id FROM mails WHERE owner = ?", user.getFullEmail());
@@ -59,7 +71,8 @@ public class Mails extends DBStorage<Mail> {
     }
 
     public int getMaxUID() {
-        ResultSet rs = DB.getSql().querySelect("SELECT MAX(id) as `max` FROM mails");
+        ResultSet rs = DB.getSql().querySelect("SELECT MAX(id) as `max` FROM mails",ResultSet.TYPE_SCROLL_SENSITIVE,
+                ResultSet.CONCUR_UPDATABLE);
         try {
             if (!rs.first()) return 0;
             return rs.getInt("max");

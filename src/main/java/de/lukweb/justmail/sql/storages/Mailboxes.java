@@ -35,7 +35,7 @@ public class Mailboxes extends DBStorage<Mailbox> {
             setUsed(id);
             return store.get(id);
         }
-        ResultSet rs = DB.getSql().querySelect("SELECT * FROM mailboxes WHERE id = ?", id);
+        ResultSet rs = DB.getSql().querySelect("SELECT * FROM mailboxes WHERE owner = ?", id);
         try {
             if (!rs.first()) return null;
             Mailbox mailbox = mapResultSet(rs);
@@ -73,7 +73,7 @@ public class Mailboxes extends DBStorage<Mailbox> {
     @Override
     protected int insert(Mailbox object) {
         ResultSet rs = DB.getSql().queryUpdateWithKeys("INSERT INTO mailboxes (`name`, `owner`) VALUES (?, ?)",
-                object.getName(), object.getOwner());
+                object.getName(), object.getOwner().getId());
         int newid = getFirstKey(rs);
         if (newid != -1) setUsed(newid);
         return newid;

@@ -12,7 +12,6 @@ public class QuitC extends SmtpCommand {
 
     @Override
     public void execute(String[] arguments, SmtpSession session) {
-        session.send(SmtpResponse.SERVICE_CLOSING.create());
         session.close();
     }
 }
