@@ -28,7 +28,7 @@ public class DeleteC extends ImapCommand {
         Mailbox mailbox = Storages.get(Mailboxes.class).get(session.getUser(), arguments[0]);
         if (!session.checkForExistence(tag, mailbox)) return;
 
-        if (session.getSelected().equals(mailbox)) session.setSelected(null);
+        if (session.getSelected() != null && session.getSelected().equals(mailbox)) session.setSelected(null);
         Storages.get(Mailboxes.class).delete(mailbox);
 
         session.send(ImapResponse.OK.create(tag, "DELETE Completed"));

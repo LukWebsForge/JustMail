@@ -35,6 +35,7 @@ public class LoginC extends ImapCommand {
             return;
         }
 
+        session.send(ImapResponse.OK.create(tag,"LOGIN completed"));
         session.setUser(user);
     }
 

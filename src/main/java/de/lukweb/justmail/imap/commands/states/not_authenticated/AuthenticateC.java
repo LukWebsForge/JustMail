@@ -1,6 +1,5 @@
 package de.lukweb.justmail.imap.commands.states.not_authenticated;
 
-import de.lukweb.justmail.console.JustLogger;
 import de.lukweb.justmail.crypto.CryptoUtils;
 import de.lukweb.justmail.imap.ImapSession;
 import de.lukweb.justmail.imap.commands.objects.ImapCommand;
@@ -30,8 +29,7 @@ public class AuthenticateC extends ImapCommand {
             if (arguments.length == 1) {
                 session.send("+ ");
                 session.setCallback(cache -> {
-                    JustLogger.logger().info(cache);
-                    authenticateUser(session, cache, tag);
+                    authenticateUser(session, cache.trim(), tag);
                     return true;
                 });
             } else {
@@ -46,10 +44,9 @@ public class AuthenticateC extends ImapCommand {
                     //Password:
                     session.send("+ UGFzc3dvcmQ6");
                     session.setCallback(password -> {
-                        String auth = Base64.getEncoder().encodeToString(("\0" + new String(Base64.getDecoder().decode(username.trim()), StandardCharsets.UTF_8)
-                                + "\0" + new String(Base64.getDecoder().decode(password.trim()), StandardCharsets.UTF_8))
-                                .getBytes(StandardCharsets.UTF_8));
-                        authenticateUser(session, auth, tag);
+                        String plainPassword = new String(Base64.getDecoder().decode(password.trim()), StandardCharsets.UTF_8);
+                        String email = ("\0" + new String(Base64.getDecoder().decode(username.trim()), StandardCharsets.UTF_8) + "\0");
+                        authenticateUser(session, Base64.getEncoder().encodeToString((email + plainPassword).getBytes()), tag);
                         return true;
                     });
                     return false;
@@ -71,7 +68,13 @@ public class AuthenticateC extends ImapCommand {
     }
 
     private void authenticateUser(ImapSession session, String plain, String tag) {
-        User user = Storages.get(Users.class).getByBase64(new String(CryptoUtils.generateSHA512Password(plain.trim().toCharArray())));
+        String base64Authenticate = new String(Base64.getDecoder().decode(plain), StandardCharsets.UTF_8);
+        int lastIndex = base64Authenticate.lastIndexOf("\0");
+        String[] data = {base64Authenticate.substring(0, lastIndex+1), base64Authenticate.substring(lastIndex+1)};
+        char[] test = new char[data[0].length() + data[1].length()];
+        System.arraycopy(data[0].toCharArray(), 0, test, 0, data[0].length());
+        System.arraycopy(data[1].toCharArray(), 0, test, data[0].length(), data[1].length());
+        User user = Storages.get(Users.class).getByBase64(Base64.getEncoder().encode(CryptoUtils.generateSHA512Password(test)));
         if (user == null) {
             session.send(ImapResponse.NO.create(tag, "Authentication credentials invalid"));
             return;

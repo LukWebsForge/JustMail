@@ -1,5 +1,6 @@
 package de.lukweb.justmail.sql.storages;
 
+import de.lukweb.justmail.console.JustLogger;
 import de.lukweb.justmail.sql.DB;
 import de.lukweb.justmail.sql.DBStorage;
 import de.lukweb.justmail.sql.Storages;
@@ -47,9 +48,12 @@ public class Users extends DBStorage<User> {
         return store.get(id);
     }
 
-    public User getByBase64(String base64up) {
-        byte[] base64 = base64up.trim().getBytes(StandardCharsets.UTF_8);
-        for (User user : store.values()) if (Arrays.equals(user.getPasswords().getBase64(), base64)) return user;
+    public User getByBase64(byte[] base64up) {
+        for (User user : store.values()){
+            if (Arrays.equals(user.getPasswords().getBase64(), base64up)){
+                return user;
+            }
+        }
         return null;
     }
 
