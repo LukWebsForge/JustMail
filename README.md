@@ -1,9 +1,25 @@
 # JustMail
-A simple mail server written in Java
-
-[![CircleCI](https://circleci.com/gh/LukWebsForge/JustMail.svg?style=svg)](https://circleci.com/gh/LukWebsForge/JustMail)
-[![Build Status](https://travis-ci.org/LukWebsForge/JustMail.svg?branch=master)](https://travis-ci.org/LukWebsForge/JustMail)
-
+An unfinished attempt at creating a fully integrated mail server supporting SMTP and IMAP in Java.
 
 ![SMTP](https://img.shields.io/badge/SMTP-supported-brightgreen.svg)
 ![IMAP](https://img.shields.io/badge/IMAP-in_progress-yellow.svg)
+
+## Building
+
+You can compile the mail server using [Maven](https://maven.apache.org).
+
+```bash
+mvn package
+```
+
+The compilation process outputs the build artifact `target/JustMail.jar` which contains all dependencies.
+
+The mail server can be started in the command line.
+```
+java -jar JustMail.jar
+```
+
+## Implementation Status
+
+Take a look at the project's [issues](https://github.com/LukWebsForge/JustMail/issues) to see which parts of the relevant mail standards are implemented.
+
